@@ -12,38 +12,66 @@ namespace DataAccess.Repository
 
         public Repository(ApplicationDbContext db)
         {
-            this._db = db;
+            _db = db;
             dbSet = _db.Set<T>();
         }
 
-        public Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = dbSet;
+            query = query.Where(filter);
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property);
+                }
+            }
+            return await query.FirstOrDefaultAsync();
         }
 
-        public Task<IEnumerable<T>> GetAllAsync(string? includeProperties = null)
+        public async Task<IEnumerable<T>> GetAllAsync(string? includeProperties = null)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = dbSet;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property);
+                }
+            }
+            return await query.ToListAsync();
         }
 
-        public Task AddAsync(T entity)
+        public async Task<bool> AddAsync(T entity)
         {
-            throw new NotImplementedException();
+            if (entity == null)
+            {
+                return false;
+            }
+            await dbSet.AddAsync(entity);
+            return true;
         }
 
-        public Task<bool> DeleteAsync(T entity)
+        public async Task<bool> DeleteAsync(T entity)
         {
-            throw new NotImplementedException();
+            if (entity == null)
+            {
+                return false;
+            }
+            dbSet.Remove(entity);
+            return true;
         }
 
-        public Task<bool> DeleteRangeAsync(T entity)
+        public async Task<bool> DeleteRangeAsync(T entities)
         {
-            throw new NotImplementedException();
+            if (entities == null)
+            {
+                return false;
+            }
+            dbSet.Remove(entities);
+            return true;
         }
 
-        public virtual Task UpdateAsync(T entity)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
