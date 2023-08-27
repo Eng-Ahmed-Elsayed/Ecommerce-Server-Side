@@ -47,30 +47,30 @@ namespace DataAccess.Repository
         {
             if (entity == null)
             {
-                return false;
+                return await Task.FromResult(false);
             }
             await dbSet.AddAsync(entity);
-            return true;
+            return await Task.FromResult(true);
         }
 
         public async Task<bool> DeleteAsync(T entity)
         {
             if (entity == null)
             {
-                return false;
+                return await Task.FromResult(false);
             }
             dbSet.Remove(entity);
-            return true;
+            return await Task.FromResult(true);
         }
 
         public async Task<bool> DeleteRangeAsync(T entities)
         {
             if (entities == null)
             {
-                return false;
+                return await Task.FromResult(false);
             }
             dbSet.Remove(entities);
-            return true;
+            return await Task.FromResult(true);
         }
 
     }
