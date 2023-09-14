@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Models.DataTransferObjects;
+using Models.DataTransferObjects.Auth;
 using Models.Models;
 using Security.JWT;
 using Utility.Email;
@@ -51,7 +52,10 @@ namespace ecommerce_server_side.Controllers
         {
             if (userForRegistrationDto == null || !ModelState.IsValid)
             {
-                return BadRequest();
+                var error = string.Join(" | ", ModelState.Values
+                   .SelectMany(v => v.Errors)
+                   .Select(e => e.ErrorMessage));
+                return BadRequest(new RegistrationResponseDto { Error = error, IsSuccessfulRegistration = false });
             }
             var user = _mapper.Map<User>(userForRegistrationDto);
 
@@ -72,16 +76,16 @@ namespace ecommerce_server_side.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userForAuthentication)
         {
-            var user = await _userManager.FindByNameAsync(userForAuthentication.Email);
+            var user = await _userManager.FindByNameAsync(userForAuthentication.UserName);
             if (user == null)
             {
-                return BadRequest("Invalid Request");
+                return BadRequest("Invalid username or password");
             }
 
             if (await _userManager.IsLockedOutAsync(user))
             {
                 var content = $"Your account is locked out. To reset the password click this link: {userForAuthentication.ClientURI}";
-                var message = new Message(new string[] { userForAuthentication.Email },
+                var message = new Message(new string[] { user.Email },
                     "Locked out account information", content);
                 await _emailSender.SendEmailAsync(message);
                 return Unauthorized(new AuthResponseDto { ErrorMessage = "The account is locked out" });
@@ -90,7 +94,7 @@ namespace ecommerce_server_side.Controllers
             if (!await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
             {
                 await _userManager.AccessFailedAsync(user);
-                return Unauthorized(new AuthResponseDto { ErrorMessage = "Invalid Authentication" });
+                return Unauthorized(new AuthResponseDto { ErrorMessage = "Invalid username or password" });
             }
 
             if (!await _userManager.IsEmailConfirmedAsync(user))

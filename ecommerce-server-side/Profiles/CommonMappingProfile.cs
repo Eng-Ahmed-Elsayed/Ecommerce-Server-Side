@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Models.Models;
 
 namespace Models.DataTransferObjects
 {
@@ -6,10 +7,9 @@ namespace Models.DataTransferObjects
     {
         public CommonMappingProfile()
         {
-            //CreateMap<UserForRegistrationDto, User>()
-            //    .ForMember(u => u.UserName, opt => opt.MapFrom(x => x.Email));
-            //CreateMap<EmployeeDto, Employee>();
-            //CreateMap<Employee, EmployeeDto>();
+            CreateMap<CategoryDto, Category>();
+            CreateMap<Category, CategoryDto>();
+
         }
     }
 }

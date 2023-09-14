@@ -1,4 +1,4 @@
-﻿namespace Models.DataTransferObjects
+﻿namespace Models.DataTransferObjects.Auth
 {
     public class AuthResponseDto
     {

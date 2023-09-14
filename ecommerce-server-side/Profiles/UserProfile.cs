@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Models.DataTransferObjects;
+using Models.DataTransferObjects.Auth;
 using Models.Models;
 
 
@@ -10,7 +10,7 @@ namespace ecommerce_server_side.Profiles
         public UserProfile()
         {
             CreateMap<UserForRegistrationDto, User>()
-                .ForMember(u => u.UserName, opt => opt.MapFrom(x => x.Email));
+                .ForMember(u => u.UserName, opt => opt.MapFrom(x => x.UserName));
         }
     }
 }

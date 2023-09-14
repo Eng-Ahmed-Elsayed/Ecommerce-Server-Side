@@ -5,7 +5,7 @@ using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Models.DataTransferObjects;
+using Models.DataTransferObjects.Auth;
 using Models.Models;
 
 namespace Security.JWT

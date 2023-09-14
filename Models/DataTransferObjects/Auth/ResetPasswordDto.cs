@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.DataTransferObjects
+namespace Models.DataTransferObjects.Auth
 {
     public class ResetPasswordDto
     {

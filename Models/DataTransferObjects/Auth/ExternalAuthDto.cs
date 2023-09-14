@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Models.DataTransferObjects
+namespace Models.DataTransferObjects.Auth
 {
     public class ExternalAuthDto
     {
