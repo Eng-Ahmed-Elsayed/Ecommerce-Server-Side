@@ -20,6 +20,7 @@ namespace DataAccess.Repository
         {
             IQueryable<T> query = dbSet;
             query = query.Where(filter);
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -30,9 +31,15 @@ namespace DataAccess.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(string? includeProperties = null)
+        public async Task<IEnumerable<T>> GetListAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+
+            }
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))

@@ -7,8 +7,8 @@ namespace Models.DataTransferObjects
     {
         public CommonMappingProfile()
         {
-            CreateMap<CategoryDto, Category>();
-            CreateMap<Category, CategoryDto>();
+            CreateMap<CategoryDto, Category>().ReverseMap();
+            //CreateMap<Category, CategoryDto>();
 
         }
     }

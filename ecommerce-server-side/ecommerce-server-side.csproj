@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\Images\Category\" />
+  </ItemGroup>
+
 </Project>

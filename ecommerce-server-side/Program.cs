@@ -4,8 +4,10 @@ using DataAccess.Repository;
 using DataAccess.Repository.IRepository;
 using ecommerce_server_side.Profiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Models.DataTransferObjects;
 using Models.Models;
@@ -72,6 +74,14 @@ builder.Services.AddAuthentication(opt =>
 });
 builder.Services.AddScoped<JwtHandler>();
 
+// Config to add images
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -82,8 +92,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.UseStaticFiles();
-
+// Static Files Config
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+    RequestPath = new PathString("/Resources")
+});
 app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseRouting();

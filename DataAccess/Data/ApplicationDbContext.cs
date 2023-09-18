@@ -87,6 +87,13 @@ namespace DataAccess.Data
             modelBuilder.Entity<ShoppingSession>()
             .HasMany<CartItem>()
             .WithOne();
+
+            // Images
+            modelBuilder.Entity<Category>()
+            .HasMany<CategoryImage>()
+            .WithOne()
+            .HasForeignKey(e => e.CategoryId)
+            .IsRequired();
         }
 
         public DbSet<CartItem> CartItems { get; set; }
