@@ -24,24 +24,25 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpPost, DisableRequestSizeLimit]
-        [Route("upload")]
-        public async Task<IActionResult> Upload()
+        [Route("upload-file")]
+        public async Task<IActionResult> UploadFile()
         {
             try
             {
                 var formCollection = await Request.ReadFormAsync();
                 var file = formCollection.Files.First();
-                var folderName = Path.Combine("Resources", "Images", "Category");
+                var folderName = Path.Combine("StaticFiles", "Images", "Category");
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
                 if (file.Length > 0)
                 {
-                    var fileName = Guid.NewGuid().ToString() + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    var fullPath = Path.Combine(pathToSave, fileName);
-                    var dbPath = Path.Combine(folderName, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        file.CopyTo(stream);
-                    }
+                    //var fileName = Guid.NewGuid().ToString() + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    //var fullPath = Path.Combine(pathToSave, fileName);
+                    //var dbPath = Path.Combine(folderName, fileName);
+                    //using (var stream = new FileStream(fullPath, FileMode.Create))
+                    //{
+                    //    file.CopyTo(stream);
+                    //}
+                    var dbPath = SaveFile(file, pathToSave, folderName);
                     return Ok(new { dbPath });
                 }
                 else
@@ -53,6 +54,46 @@ namespace ecommerce_server_side.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex}");
             }
+        }
+        [HttpPost, DisableRequestSizeLimit]
+        [Route("upload-files")]
+        public IActionResult UploadFiles()
+        {
+            try
+            {
+                Request.Form.Files.Count();
+                var files = Request.Form.Files;
+                var folderName = Path.Combine("StaticFiles", "Images", "Product");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                if (files.Any(f => f.Length == 0))
+                {
+                    return BadRequest();
+                }
+                var dbPathList = new List<string>();
+                foreach (var file in files)
+                {
+                    var dbPath = SaveFile(file, pathToSave, folderName);
+                    dbPathList.Add(dbPath);
+                }
+                return Ok(new { dbPathList });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        // Save file
+        private string SaveFile(IFormFile? file, string pathToSave, string folderName)
+        {
+            var fileName = Guid.NewGuid().ToString() + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+            var fullPath = Path.Combine(pathToSave, fileName);
+            var dbPath = Path.Combine(folderName, fileName);
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+            return dbPath;
         }
 
         // Delete image with path
@@ -67,6 +108,7 @@ namespace ecommerce_server_side.Controllers
 
         }
 
+        // <-------Category Actions------->
         [HttpPost]
         [Route("category/add")]
         public async Task<IActionResult> AddCategory([FromBody] CategoryDto? categoryDto)
@@ -194,6 +236,7 @@ namespace ecommerce_server_side.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
         [HttpDelete]
         [Route("category")]
         public async Task<IActionResult> DeleteCategoryRange([FromBody] CategoryDto[] categoryDtos)

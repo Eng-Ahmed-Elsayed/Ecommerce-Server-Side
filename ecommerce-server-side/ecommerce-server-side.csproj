@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\Images\Category\" />
+    <Folder Include="StaticFiles\Images\Product\" />
   </ItemGroup>
 
 </Project>

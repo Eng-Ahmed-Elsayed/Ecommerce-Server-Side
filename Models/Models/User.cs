@@ -12,8 +12,8 @@ namespace Models.Models
         public ICollection<UserPayment> UserPayments { get; } = new List<UserPayment>();
 
 
-        [DataType(DataType.Date)]
-        public DateTime CreatedAt { get; set; }
+        
+        public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool? IsDeleted { get; set; }

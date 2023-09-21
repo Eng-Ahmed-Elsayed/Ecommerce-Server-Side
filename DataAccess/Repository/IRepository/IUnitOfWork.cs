@@ -13,6 +13,9 @@
         IShoppingSessionRepository ShoppingSession { get; }
         IUserAddressRepository UserAddress { get; }
         IUserPaymentRepository UserPayment { get; }
+        ITagRepository Tag { get; }
+        IColorRepository Color { get; }
+        IProductImageRepository ProductImage { get; }
 
         Task SaveAsync();
     }

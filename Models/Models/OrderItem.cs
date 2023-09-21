@@ -8,10 +8,12 @@ namespace Models.Models
         public Guid OrderDetailsId { get; set; }
         public OrderDetails OrderDetails { get; set; }
         public Guid ProductId { get; set; }
-        public int Quantity { get; set; }
+        [Required]
+        [Range(0, 999999)]
+        public double Quantity { get; set; }
 
-        [DataType(DataType.Date)]
-        public DateTime CreatedAt { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool? IsDeleted { get; set; }

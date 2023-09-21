@@ -28,6 +28,9 @@ namespace DataAccess.Repository
         public IUserAddressRepository UserAddress { get; private set; }
 
         public IUserPaymentRepository UserPayment { get; private set; }
+        public IColorRepository Color { get; private set; }
+        public ITagRepository Tag { get; private set; }
+        public IProductImageRepository ProductImage { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -43,6 +46,9 @@ namespace DataAccess.Repository
             ShoppingSession = new ShoppingSessionRepository(_db);
             UserAddress = new UserAddressRepository(_db);
             UserPayment = new UserPaymentRepository(_db);
+            Color = new ColorRepository(_db);
+            Tag = new TagRepository(_db);
+            ProductImage = new ProductImageRepository(_db);
 
         }
 

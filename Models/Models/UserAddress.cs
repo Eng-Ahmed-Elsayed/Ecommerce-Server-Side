@@ -12,12 +12,14 @@ namespace Models.Models
         public string City { get; set; }
         public string PostalCode { get; set; }
         public string Country { get; set; }
+        [Phone]
         public string? Telephone { get; set; }
+        [Phone]
         public string Mobile { get; set; }
 
 
-        [DataType(DataType.Date)]
-        public DateTime CreatedAt { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool? IsDeleted { get; set; }
