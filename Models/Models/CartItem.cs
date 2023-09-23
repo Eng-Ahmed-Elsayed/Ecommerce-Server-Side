@@ -8,7 +8,7 @@ namespace Models.Models
         public Guid ShoppingSessionId { get; set; }
         public Guid ProductId { get; set; }
         [Range(1, 9999)]
-        public double Quantity { get; set; }
+        public int Quantity { get; set; }
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

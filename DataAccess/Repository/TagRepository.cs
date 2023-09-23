@@ -12,7 +12,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(Tag tag)
+        public async Task<bool> UpdateAsync(Tag tag)
         {
             if (tag == null) { return await Task.FromResult(false); }
             _db.Tags.Update(tag);

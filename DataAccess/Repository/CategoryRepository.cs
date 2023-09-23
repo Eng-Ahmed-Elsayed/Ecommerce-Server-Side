@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(Category category)
+        public async Task<bool> UpdateAsync(Category category)
         {
             if (category == null) { return await Task.FromResult(false); }
             _db.Categories.Update(category);

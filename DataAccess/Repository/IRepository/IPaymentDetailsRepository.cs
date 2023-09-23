@@ -4,6 +4,6 @@ namespace DataAccess.Repository.IRepository
 {
     public interface IPaymentDetailsRepository : IRepository<PaymentDetails>
     {
-        Task<bool> Update(PaymentDetails paymentDetails);
+        Task<bool> UpdateAsync(PaymentDetails paymentDetails);
     }
 }

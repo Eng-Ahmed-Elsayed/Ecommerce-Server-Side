@@ -35,13 +35,6 @@ namespace ecommerce_server_side.Controllers
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
                 if (file.Length > 0)
                 {
-                    //var fileName = Guid.NewGuid().ToString() + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    //var fullPath = Path.Combine(pathToSave, fileName);
-                    //var dbPath = Path.Combine(folderName, fileName);
-                    //using (var stream = new FileStream(fullPath, FileMode.Create))
-                    //{
-                    //    file.CopyTo(stream);
-                    //}
                     var dbPath = SaveFile(file, pathToSave, folderName);
                     return Ok(new { dbPath });
                 }
@@ -55,6 +48,7 @@ namespace ecommerce_server_side.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
         [HttpPost, DisableRequestSizeLimit]
         [Route("upload-files")]
         public IActionResult UploadFiles()
@@ -156,12 +150,15 @@ namespace ecommerce_server_side.Controllers
                 }
 
                 // Delete the old image
-                DeleteImage(category.ImgPath);
+                if (category.ImgPath != categoryDto.ImgPath)
+                {
+                    DeleteImage(category.ImgPath);
+                    category.ImgPath = categoryDto.ImgPath;
+                }
 
                 // Update teh fields
                 category.Name = categoryDto.Name;
                 category.Description = categoryDto.Description;
-                category.ImgPath = categoryDto.ImgPath;
                 category.UpdatedAt = DateTime.Now;
 
                 await _unitOfWork.SaveAsync();
@@ -196,7 +193,9 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var category = await _unitOfWork.Category.GetAsync(c => c.Id == id);
+                var category = await _unitOfWork.Category.GetAsync(c =>
+                (c.Id == id && c.IsDeleted != true));
+
                 if (category == null)
                 {
                     return NotFound();

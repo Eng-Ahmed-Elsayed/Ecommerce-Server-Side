@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(Discount discount)
+        public async Task<bool> UpdateAsync(Discount discount)
         {
             if (discount == null) { return await Task.FromResult(false); }
             _db.Discounts.Update(discount);

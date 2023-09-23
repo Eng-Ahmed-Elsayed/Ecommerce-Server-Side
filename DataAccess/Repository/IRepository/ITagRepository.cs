@@ -4,6 +4,6 @@ namespace DataAccess.Repository.IRepository
 {
     public interface ITagRepository : IRepository<Tag>
     {
-        Task<bool> Update(Tag tag);
+        Task<bool> UpdateAsync(Tag tag);
     }
 }

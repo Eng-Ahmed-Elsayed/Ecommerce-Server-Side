@@ -30,14 +30,14 @@ namespace Models.DataTransferObjects
         //[Required]
         public string? Status { get; set; }
         //[Required]
-        public bool? InStock { get; set; }
+        public bool InStock { get; set; }
         //[MaxLength(20)]
         //public List<Tag>? Tags { get; set; }
         public List<Tag>? Tags { get; set; }
         //[MaxLength(20)]
         public List<Color>? Colors { get; set; }
         public List<ProductImage>? ProductImages { get; set; }
-        public double Quantity { get; set; }
+        public int Quantity { get; set; }
 
 
         public Guid? CategoryId { get; set; }

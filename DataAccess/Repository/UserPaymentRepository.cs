@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(UserPayment userPayment)
+        public async Task<bool> UpdateAsync(UserPayment userPayment)
         {
             if (userPayment == null) { return await Task.FromResult(false); }
             _db.UserPayments.Update(userPayment);

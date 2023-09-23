@@ -4,6 +4,6 @@ namespace DataAccess.Repository.IRepository
 {
     public interface IProductRepository : IRepository<Product>
     {
-        Task<bool> Update(Product product);
+        Task<bool> UpdateAsync(Product product);
     }
 }

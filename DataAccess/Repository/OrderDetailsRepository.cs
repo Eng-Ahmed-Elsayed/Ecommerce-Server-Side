@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(OrderDetails orderDetails)
+        public async Task<bool> UpdateAsync(OrderDetails orderDetails)
         {
             if (orderDetails == null) { return await Task.FromResult(false); }
             _db.OrdersDetails.Update(orderDetails);

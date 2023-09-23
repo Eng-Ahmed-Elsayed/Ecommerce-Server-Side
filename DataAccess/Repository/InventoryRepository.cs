@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(Inventory inventory)
+        public async Task<bool> UpdateAsync(Inventory inventory)
         {
             if (inventory == null) { return await Task.FromResult(false); }
             _db.Inventories.Update(inventory);

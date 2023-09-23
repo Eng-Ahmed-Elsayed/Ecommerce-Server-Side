@@ -7,7 +7,7 @@ namespace Models.Models
         public Guid Id { get; set; }
         [Required]
         [Range(0, 999999)]
-        public double Quantity { get; set; }
+        public int Quantity { get; set; }
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

@@ -4,6 +4,6 @@ namespace DataAccess.Repository.IRepository
 {
     public interface ICartItemRepository : IRepository<CartItem>
     {
-        Task<bool> Update(CartItem cartItem);
+        Task<bool> UpdateAsync(CartItem cartItem);
     }
 }

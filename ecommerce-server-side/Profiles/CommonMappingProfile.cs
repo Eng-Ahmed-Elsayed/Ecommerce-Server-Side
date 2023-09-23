@@ -9,7 +9,7 @@ namespace Models.DataTransferObjects
         {
             CreateMap<CategoryDto, Category>().ReverseMap();
             CreateMap<ProductDto, Product>().ReverseMap();
-            //CreateMap<Category, CategoryDto>().;
+            CreateMap<DiscountDto, Discount>().ReverseMap();
 
         }
     }

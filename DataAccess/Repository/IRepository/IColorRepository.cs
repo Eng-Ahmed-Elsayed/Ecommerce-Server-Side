@@ -4,6 +4,6 @@ namespace DataAccess.Repository.IRepository
 {
     public interface IColorRepository : IRepository<Color>
     {
-        Task<bool> Update(Color color);
+        Task<bool> UpdateAsync(Color color);
     }
 }

@@ -77,6 +77,14 @@ namespace DataAccess.Data
             .HasOne<CartItem>()
             .WithOne();
 
+            modelBuilder.Entity<Product>()
+            .HasMany(e => e.Tags)
+            .WithMany();
+
+            modelBuilder.Entity<Product>()
+            .HasMany(e => e.Colors)
+            .WithMany();
+
 
             // OrderDetails with OrderItem
             modelBuilder.Entity<OrderDetails>()

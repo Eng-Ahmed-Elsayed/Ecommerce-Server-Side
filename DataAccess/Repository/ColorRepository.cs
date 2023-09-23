@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(Color color)
+        public async Task<bool> UpdateAsync(Color color)
         {
             if (color == null) { return await Task.FromResult(false); }
             _db.Colors.Update(color);

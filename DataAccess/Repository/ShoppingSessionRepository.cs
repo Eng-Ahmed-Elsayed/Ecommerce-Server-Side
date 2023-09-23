@@ -11,7 +11,7 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
-        public async Task<bool> Update(ShoppingSession shoppingSession)
+        public async Task<bool> UpdateAsync(ShoppingSession shoppingSession)
         {
             if (shoppingSession == null) { return await Task.FromResult(false); }
             _db.ShoppingSessions.Update(shoppingSession);
