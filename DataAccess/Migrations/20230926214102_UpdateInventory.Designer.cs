@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230923191743_Initail")]
-    partial class Initail
+    [Migration("20230926214102_UpdateInventory")]
+    partial class UpdateInventory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -895,7 +895,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Models.Models.Product", b =>
                 {
-                    b.HasOne("Models.Models.Category", null)
+                    b.HasOne("Models.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId");
 
@@ -903,9 +903,13 @@ namespace DataAccess.Migrations
                         .WithMany("Products")
                         .HasForeignKey("DiscoutId");
 
-                    b.HasOne("Models.Models.Inventory", null)
-                        .WithMany()
+                    b.HasOne("Models.Models.Inventory", "Inventory")
+                        .WithMany("Products")
                         .HasForeignKey("InventoryId");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Inventory");
                 });
 
             modelBuilder.Entity("Models.Models.ProductImage", b =>
@@ -956,6 +960,11 @@ namespace DataAccess.Migrations
                 });
 
             modelBuilder.Entity("Models.Models.Discount", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Models.Models.Inventory", b =>
                 {
                     b.Navigation("Products");
                 });

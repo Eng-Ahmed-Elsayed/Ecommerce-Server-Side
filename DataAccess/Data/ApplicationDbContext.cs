@@ -46,13 +46,13 @@ namespace DataAccess.Data
             // Product relations
             modelBuilder.Entity<Category>()
             .HasMany<Product>()
-            .WithOne()
+            .WithOne(x => x.Category)
             .HasForeignKey(e => e.CategoryId)
             .IsRequired(false);
 
             modelBuilder.Entity<Inventory>()
-            .HasMany<Product>()
-            .WithOne()
+            .HasMany(e => e.Products)
+            .WithOne(e => e.Inventory)
             .HasForeignKey(e => e.InventoryId)
             .IsRequired(false);
 
@@ -103,7 +103,6 @@ namespace DataAccess.Data
             modelBuilder.Entity<ShoppingSession>()
             .HasMany<CartItem>()
             .WithOne();
-
         }
 
         public DbSet<CartItem> CartItems { get; set; }

@@ -30,13 +30,24 @@ namespace ecommerce_server_side.Controllers
             try
             {
                 var product = await _unitOfWork.Product.GetAsync(p =>
-                (p.Id == id && p.IsDeleted != true));
+                (p.Id == id && p.IsDeleted != true), "ProductImages,Tags,Colors");
                 if (product == null)
                 {
                     return NotFound();
                 }
-
                 var productResult = _mapper.Map<ProductDto>(product);
+                // Get discount
+                if (productResult.DiscoutId != null)
+                {
+                    productResult.Discount = await _unitOfWork.Discount.GetAsync(x => x.Id == productResult.DiscoutId);
+                }
+                // Get quantity
+                var invntory = await _unitOfWork.Inventory.GetAsync(x => x.Id == productResult.InventoryId);
+
+                if (invntory != null)
+                {
+                    productResult.Quantity = invntory.Quantity;
+                }
                 return Ok(productResult);
             }
             catch (Exception ex)
@@ -51,9 +62,9 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                //var categories = await _unitOfWork.Product.GetListAsync();
-                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true, "ProductImages,Tags,Colors");
+                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true, "ProductImages,Tags,Colors,Category,Inventory");
                 var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
+
                 return Ok(productsResult);
             }
             catch (Exception ex)
@@ -144,14 +155,20 @@ namespace ecommerce_server_side.Controllers
             return colors;
         }
 
-        // Delete image with path
-        private void DeleteImage(string imgPath)
+        // Delete image with path from DB and Local Storage
+        private async Task DeleteImage(string imgPath)
         {
 
             if (!imgPath.IsNullOrEmpty())
             {
                 var fullPath = Path.Combine(Directory.GetCurrentDirectory(), imgPath);
                 System.IO.File.Delete(fullPath);
+                var imgToBeDelted = await _unitOfWork.ProductImage.GetAsync(x => x.ImgPath == imgPath);
+                if (imgToBeDelted != null)
+                {
+                    await _unitOfWork.ProductImage.DeleteAsync(imgToBeDelted);
+                }
+
             }
 
         }
@@ -167,45 +184,36 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invaild Model!");
                 }
 
-                var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id);
+                var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id, "ProductImages,Tags,Colors");
                 if (product == null)
                 {
                     return NotFound();
                 }
 
-                // Delete the old images if there is an update then add update ProductImages field
+                // Delete the old images if there is an update then add update ProductImages.
                 if (product.ProductImages != productDto.ProductImages && !productDto.ProductImages.IsNullOrEmpty())
                 {
+                    // Delete image with path from DB and Local Storage
                     foreach (var productImg in product.ProductImages)
                     {
-                        if (!productDto.ProductImages.Exists(x => x.Id == productImg.Id))
-                        {
-                            DeleteImage(productImg.ImgPath);
-                        }
+                        await DeleteImage(productImg.ImgPath);
                     }
-                    product.ProductImages = productDto.ProductImages;
+                    // Add new images in the db
+                    foreach (var img in productDto.ProductImages)
+                    {
+                        ProductImage newImg = new ProductImage()
+                        {
+                            Id = Guid.NewGuid(),
+                            ImgPath = img.ImgPath,
+                            ProductId = productDto.Id
+                        };
+                        await _unitOfWork.ProductImage.AddAsync(newImg);
+                    }
                 }
-
                 //Update tags if there is new tags
-                if (product.Tags != productDto.Tags)
-                {
-                    product.Tags = await UpdateProductTagsAsync(productDto.Tags);
-                }
-                else
-                {
-                    product.Tags = productDto.Tags;
-                }
-
+                product.Tags = await UpdateProductTagsAsync(productDto.Tags);
                 // Update colors if there is new colors
-                if (product.Colors != productDto.Colors)
-                {
-                    product.Colors = await UpdateProductColorsAsync(productDto.Colors);
-                }
-                else
-                {
-                    product.Colors = productDto.Colors;
-                }
-
+                product.Colors = await UpdateProductColorsAsync(productDto.Colors);
                 // Update other fields
                 product.Name = productDto.Name;
                 product.Description = productDto.Description;
@@ -239,13 +247,18 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var product = await _unitOfWork.Product.GetAsync(c => c.Id == id && c.IsDeleted != true);
+                var product = await _unitOfWork.Product.GetAsync(c =>
+                c.Id == id && c.IsDeleted != true, "ProductImages");
                 if (product == null)
                 {
                     return NotFound("The product is not exist");
                 }
-                // Delete the image first
-                //DeleteImage(product.ImgPath);
+                // Delete the images first
+                // Delete image with path from DB and Local Storage
+                foreach (var productImg in product.ProductImages)
+                {
+                    await DeleteImage(productImg.ImgPath);
+                }
                 // Delete the product
                 product.IsDeleted = true;
                 product.DeletedAt = DateTime.Now;
@@ -266,13 +279,18 @@ namespace ecommerce_server_side.Controllers
             {
                 foreach (var productDto in productDtos)
                 {
-                    var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id && c.IsDeleted != true);
+                    var product = await _unitOfWork.Product.GetAsync(c =>
+                    c.Id == productDto.Id && c.IsDeleted != true, "ProductImages");
                     if (product == null)
                     {
                         return NotFound("The product is not exist");
                     }
                     // Delete the image first
-                    //DeleteImage(product.ImgPath);
+                    // Delete image with path from DB and Local Storage
+                    foreach (var productImg in product.ProductImages)
+                    {
+                        await DeleteImage(productImg.ImgPath);
+                    }
                     // Delete the product
                     product.IsDeleted = true;
                     product.DeletedAt = DateTime.Now;

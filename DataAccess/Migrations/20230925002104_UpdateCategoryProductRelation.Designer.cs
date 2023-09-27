@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230923212527_UpdateDiscountTable")]
-    partial class UpdateDiscountTable
+    [Migration("20230925002104_UpdateCategoryProductRelation")]
+    partial class UpdateCategoryProductRelation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -904,7 +904,7 @@ namespace DataAccess.Migrations
                         .HasForeignKey("DiscoutId");
 
                     b.HasOne("Models.Models.Inventory", null)
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("InventoryId");
                 });
 
@@ -956,6 +956,11 @@ namespace DataAccess.Migrations
                 });
 
             modelBuilder.Entity("Models.Models.Discount", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Models.Models.Inventory", b =>
                 {
                     b.Navigation("Products");
                 });

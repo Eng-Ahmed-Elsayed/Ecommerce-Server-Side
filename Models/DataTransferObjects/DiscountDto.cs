@@ -1,4 +1,6 @@
-﻿namespace Models.DataTransferObjects
+﻿using Models.Models;
+
+namespace Models.DataTransferObjects
 {
     public class DiscountDto
     {
@@ -15,5 +17,9 @@
         public List<ProductDto> Products { get; } = new List<ProductDto>();
         public List<ProductDto>? OtherProducts { get; set; }
 
+        public static implicit operator DiscountDto(Discount v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -37,11 +37,17 @@ namespace Models.DataTransferObjects
         //[MaxLength(20)]
         public List<Color>? Colors { get; set; }
         public List<ProductImage>? ProductImages { get; set; }
+        // Used in add or update product
         public int Quantity { get; set; }
 
 
         public Guid? CategoryId { get; set; }
+        public CategoryDto? Category { get; set; }
         public Guid? InventoryId { get; set; }
+        // Used in get or get list
+        public InventoryDto? Inventory { get; set; }
+
         public Guid? DiscoutId { get; set; }
+        public DiscountDto? Discount { get; set; }
     }
 }

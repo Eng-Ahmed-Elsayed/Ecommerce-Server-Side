@@ -33,18 +33,17 @@ namespace Models.Models
         [Required]
         public bool InStock { get; set; }
         [MaxLength(20)]
-        //public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<Tag> Tags { get; set; } = new();
         [MaxLength(20)]
         public List<Color> Colors { get; set; } = new();
-        //public List<ProductImage> ProductImages { get; set; }
         public List<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
 
         public Guid? CategoryId { get; set; }
+        public Category? Category { get; }
         public Guid? InventoryId { get; set; }
+        public Inventory? Inventory { get; }
         public Guid? DiscoutId { get; set; }
-        //public Discount? Discount { get; set; }
         [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
