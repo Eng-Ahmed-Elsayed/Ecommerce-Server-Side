@@ -30,7 +30,7 @@ namespace ecommerce_server_side.Controllers
             try
             {
                 var product = await _unitOfWork.Product.GetAsync(p =>
-                (p.Id == id && p.IsDeleted != true), "ProductImages,Tags,Colors");
+                (p.Id == id && p.IsDeleted != true), "ProductImages,Tags,Colors,Sizes");
                 if (product == null)
                 {
                     return NotFound();
@@ -62,7 +62,7 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true, "ProductImages,Tags,Colors,Category,Inventory");
+                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true, "ProductImages,Tags,Colors,Sizes,Category,Inventory");
                 var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
 
                 return Ok(productsResult);
@@ -95,6 +95,7 @@ namespace ecommerce_server_side.Controllers
                 await _unitOfWork.Inventory.AddAsync(inventory);
                 product.Tags = await UpdateProductTagsAsync(productDto.Tags);
                 product.Colors = await UpdateProductColorsAsync(productDto.Colors);
+                product.Sizes = await UpdateProductSizesAsync(productDto.Sizes);
                 product.InventoryId = inventory.Id;
                 product.CreatedAt = DateTime.Now;
                 bool result = await _unitOfWork.Product.AddAsync(product);
@@ -154,6 +155,28 @@ namespace ecommerce_server_side.Controllers
             }
             return colors;
         }
+        // If the size is new add it to the db then add to the size list finally return this list.
+
+        private async Task<List<Size>> UpdateProductSizesAsync(List<Size>? sizesDto)
+        {
+            List<Size> sizes = new List<Size>();
+            foreach (var sizeDto in sizesDto)
+            {
+                var color = await _unitOfWork.Size.GetAsync(t => t.Name == sizeDto.Name);
+                if (color == null)
+                {
+                    sizeDto.Id = Guid.NewGuid();
+                    await _unitOfWork.Size.AddAsync(sizeDto);
+                    await _unitOfWork.SaveAsync();
+                    sizes.Add(sizeDto);
+                }
+                else
+                {
+                    sizes.Add(color);
+                }
+            }
+            return sizes;
+        }
 
         // Delete image with path from DB and Local Storage
         private async Task DeleteImage(string imgPath)
@@ -184,7 +207,7 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invaild Model!");
                 }
 
-                var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id, "ProductImages,Tags,Colors");
+                var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id, "ProductImages,Tags,Colors,Sizes");
                 if (product == null)
                 {
                     return NotFound();
@@ -214,6 +237,8 @@ namespace ecommerce_server_side.Controllers
                 product.Tags = await UpdateProductTagsAsync(productDto.Tags);
                 // Update colors if there is new colors
                 product.Colors = await UpdateProductColorsAsync(productDto.Colors);
+                // Update sizes if there is new sizes
+                product.Sizes = await UpdateProductSizesAsync(productDto.Sizes);
                 // Update other fields
                 product.Name = productDto.Name;
                 product.Description = productDto.Description;
@@ -260,6 +285,7 @@ namespace ecommerce_server_side.Controllers
                     await DeleteImage(productImg.ImgPath);
                 }
                 // Delete the product
+                product.DiscoutId = null;
                 product.IsDeleted = true;
                 product.DeletedAt = DateTime.Now;
                 //await _unitOfWork.Product.DeleteAsync(product);

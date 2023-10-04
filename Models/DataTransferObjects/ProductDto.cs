@@ -34,6 +34,7 @@ namespace Models.DataTransferObjects
         //[MaxLength(20)]
         //public List<Tag>? Tags { get; set; }
         public List<Tag>? Tags { get; set; }
+        public List<Size>? Sizes { get; set; }
         //[MaxLength(20)]
         public List<Color>? Colors { get; set; }
         public List<ProductImage>? ProductImages { get; set; }

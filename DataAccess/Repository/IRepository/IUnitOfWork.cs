@@ -14,6 +14,7 @@
         IUserAddressRepository UserAddress { get; }
         IUserPaymentRepository UserPayment { get; }
         ITagRepository Tag { get; }
+        ISizeRepository Size { get; }
         IColorRepository Color { get; }
         IProductImageRepository ProductImage { get; }
 

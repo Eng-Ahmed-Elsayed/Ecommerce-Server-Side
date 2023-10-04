@@ -82,6 +82,10 @@ namespace DataAccess.Data
             .WithMany();
 
             modelBuilder.Entity<Product>()
+            .HasMany(e => e.Sizes)
+            .WithMany();
+
+            modelBuilder.Entity<Product>()
             .HasMany(e => e.Colors)
             .WithMany();
 
@@ -119,5 +123,6 @@ namespace DataAccess.Data
         public DbSet<Color> Colors { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Size> Sizes { get; set; }
     }
 }

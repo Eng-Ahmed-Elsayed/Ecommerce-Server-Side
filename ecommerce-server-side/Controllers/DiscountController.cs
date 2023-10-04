@@ -128,7 +128,8 @@ namespace ecommerce_server_side.Controllers
                 var discountResult = _mapper.Map<DiscountDto>(discount);
 
                 var otherProducts = await _unitOfWork.Product
-                    .GetListAsync(p => p.DiscoutId != discount.Id, "ProductImages");
+                    .GetListAsync(p =>
+                    (p.DiscoutId != discount.Id && p.IsDeleted != true), "ProductImages");
                 discountResult.OtherProducts = _mapper.Map<List<ProductDto>>(otherProducts);
                 return Ok(discountResult);
             }

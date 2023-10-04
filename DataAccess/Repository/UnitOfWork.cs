@@ -8,28 +8,19 @@ namespace DataAccess.Repository
         private ApplicationDbContext _db;
 
         public ICartItemRepository CartItem { get; private set; }
-
         public ICategoryRepository Category { get; private set; }
-
         public IDiscountRepository Discount { get; private set; }
-
         public IInventoryRepository Inventory { get; private set; }
-
         public IOrderDetailsRepository OrderDetails { get; private set; }
-
         public IOrderItemRepository OrderItem { get; private set; }
-
         public IPaymentDetailsRepository PaymentDetails { get; private set; }
-
         public IProductRepository Product { get; private set; }
-
         public IShoppingSessionRepository ShoppingSession { get; private set; }
-
         public IUserAddressRepository UserAddress { get; private set; }
-
         public IUserPaymentRepository UserPayment { get; private set; }
         public IColorRepository Color { get; private set; }
         public ITagRepository Tag { get; private set; }
+        public ISizeRepository Size { get; private set; }
         public IProductImageRepository ProductImage { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
@@ -48,6 +39,7 @@ namespace DataAccess.Repository
             UserPayment = new UserPaymentRepository(_db);
             Color = new ColorRepository(_db);
             Tag = new TagRepository(_db);
+            Size = new SizeRepository(_db);
             ProductImage = new ProductImageRepository(_db);
 
         }

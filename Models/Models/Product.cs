@@ -35,6 +35,8 @@ namespace Models.Models
         [MaxLength(20)]
         public List<Tag> Tags { get; set; } = new();
         [MaxLength(20)]
+        public List<Size> Sizes { get; set; } = new();
+        [MaxLength(20)]
         public List<Color> Colors { get; set; } = new();
         public List<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 

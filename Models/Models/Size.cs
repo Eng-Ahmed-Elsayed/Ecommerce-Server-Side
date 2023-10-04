@@ -2,12 +2,11 @@
 
 namespace Models.Models
 {
-    public class Tag
+    public class Size
     {
         public Guid Id { get; set; }
-        [Required]
         [StringLength(20)]
+        [Required]
         public string Name { get; set; }
-
     }
 }
