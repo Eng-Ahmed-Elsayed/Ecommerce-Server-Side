@@ -12,7 +12,7 @@ namespace Models.Models
         public ICollection<UserPayment> UserPayments { get; } = new List<UserPayment>();
 
 
-        
+        [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }

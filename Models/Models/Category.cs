@@ -13,6 +13,7 @@ namespace Models.Models
         public string Description { get; set; }
         public string? ImgPath { get; set; }
 
+        [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }

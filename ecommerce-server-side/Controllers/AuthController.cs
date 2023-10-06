@@ -58,6 +58,7 @@ namespace ecommerce_server_side.Controllers
                 return BadRequest(new RegistrationResponseDto { Error = error, IsSuccessfulRegistration = false });
             }
             var user = _mapper.Map<User>(userForRegistrationDto);
+            user.CreatedAt = DateTime.Now;
 
             var result = await _userManager.CreateAsync(user, userForRegistrationDto.Password);
             if (!result.Succeeded)
@@ -280,7 +281,7 @@ namespace ecommerce_server_side.Controllers
 
                 if (user == null)
                 {
-                    user = new User { Email = payload.Email, UserName = payload.Email };
+                    user = new User { Email = payload.Email, UserName = payload.Email, CreatedAt = DateTime.Now };
                     await _userManager.CreateAsync(user);
 
                     //prepare and send an email for the email confirmation

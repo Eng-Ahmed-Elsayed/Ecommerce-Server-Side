@@ -16,6 +16,8 @@ namespace Models.Models
         [Required]
         public bool IsActive { get; set; }
         public List<Product> Products { get; } = new List<Product>();
+
+        [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }

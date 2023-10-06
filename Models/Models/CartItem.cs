@@ -7,9 +7,11 @@ namespace Models.Models
         public Guid Id { get; set; }
         public Guid ShoppingSessionId { get; set; }
         public Guid ProductId { get; set; }
-        [Range(1, 9999)]
+        [Required]
+        [Range(1, 99999)]
         public int Quantity { get; set; }
 
+        [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }

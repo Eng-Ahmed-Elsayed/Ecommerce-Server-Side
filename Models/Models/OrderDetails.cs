@@ -8,13 +8,13 @@ namespace Models.Models
         public Guid Id { get; set; }
         public string? UserId { get; set; }
         [Required]
-        [Range(0.01, 999999.99)]
         [Precision(18, 2)]
         public decimal Total { get; set; }
         public Guid PaymentId { get; set; }
         public ICollection<OrderItem> OrderItems { get; } = new List<OrderItem>();
 
 
+        [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
