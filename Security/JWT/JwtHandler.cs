@@ -37,7 +37,10 @@ namespace Security.JWT
         {
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("imgPath", user.ImgPath == null? "" : user.ImgPath),
+            new Claim(ClaimTypes.NameIdentifier, user.UserName),
+
         };
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)

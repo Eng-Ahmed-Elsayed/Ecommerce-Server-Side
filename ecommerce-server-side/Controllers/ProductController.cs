@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Models.DataTransferObjects;
+using Models.DataTransferObjects.Shared;
 using Models.Models;
+using Utility.ManageFiles;
 
 namespace ecommerce_server_side.Controllers
 {
@@ -13,11 +15,13 @@ namespace ecommerce_server_side.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IManageFiles _manageFiles;
 
-        public ProductController(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductController(IUnitOfWork unitOfWork, IMapper mapper, IManageFiles manageFiles)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _manageFiles = manageFiles;
 
         }
 
@@ -75,6 +79,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpPost]
         [Route("add")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddProduct([FromBody] ProductDto? productDto)
         {
             try
@@ -109,6 +114,29 @@ namespace ecommerce_server_side.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        // Upload product images
+        [HttpPost, DisableRequestSizeLimit]
+        [Authorize(Roles = "Administrator")]
+        [Route("upload-files")]
+        public async Task<IActionResult> UploadProductImages()
+        {
+            try
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var files = formCollection.Files;
+                if (files.Any(f => f.Length == 0))
+                {
+                    return BadRequest();
+                }
+                var dbPathList = _manageFiles.UploadFiles(files, "Product");
+                return Ok(new { dbPathList });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -181,23 +209,21 @@ namespace ecommerce_server_side.Controllers
         // Delete image with path from DB and Local Storage
         private async Task DeleteImage(string imgPath)
         {
-
             if (!imgPath.IsNullOrEmpty())
             {
-                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), imgPath);
-                System.IO.File.Delete(fullPath);
-                var imgToBeDelted = await _unitOfWork.ProductImage.GetAsync(x => x.ImgPath == imgPath);
-                if (imgToBeDelted != null)
+                _manageFiles.DeleteImage(imgPath);
+                var imgToBeDeleted = await _unitOfWork.ProductImage.GetAsync(x => x.ImgPath == imgPath);
+                if (imgToBeDeleted != null)
                 {
-                    await _unitOfWork.ProductImage.DeleteAsync(imgToBeDelted);
+                    await _unitOfWork.ProductImage.DeleteAsync(imgToBeDeleted);
                 }
-
             }
 
         }
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDto productDto)
         {
             try
@@ -268,6 +294,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
         {
             try
@@ -299,6 +326,7 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteProductRange([FromBody] ProductDto[] productDtos)
         {
             try

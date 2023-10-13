@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Models.DataTransferObjects.Auth;
 
-namespace Models.Models
+namespace Models.DataTransferObjects.Shared
 {
-    public class UserPayment
+    public class UserPaymentDto
     {
         public Guid Id { get; set; }
         public string? UserId { get; set; }
-        public User? User { get; }
-        //[Required]
-        //public string PaymentType { get; set; }
+        public UserDto? User { get; }
+
         [Required]
         public string Provider { get; set; }
-        //Card Holder Name
         [Required]
         [MaxLength(80)]
         [MinLength(4)]
@@ -25,11 +24,5 @@ namespace Models.Models
         [Required]
         [StringLength(3)]
         public int Cvv { get; set; }
-
-        [Required]
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public DateTime? DeletedAt { get; set; }
-        public bool? IsDeleted { get; set; }
     }
 }

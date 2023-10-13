@@ -11,6 +11,7 @@ namespace ecommerce_server_side.Profiles
         {
             CreateMap<UserForRegistrationDto, User>()
                 .ForMember(u => u.UserName, opt => opt.MapFrom(x => x.UserName));
+            CreateMap<User, UserDto>().ReverseMap();
         }
     }
 }

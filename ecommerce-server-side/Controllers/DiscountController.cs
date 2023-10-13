@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
-using Models.DataTransferObjects;
+using Models.DataTransferObjects.Shared;
 using Models.Models;
 
 namespace ecommerce_server_side.Controllers
