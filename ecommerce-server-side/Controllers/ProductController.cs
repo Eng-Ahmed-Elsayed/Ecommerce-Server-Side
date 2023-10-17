@@ -86,7 +86,7 @@ namespace ecommerce_server_side.Controllers
             {
                 if (productDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Product is invaild.");
+                    return BadRequest("Product is invalid.");
                 }
                 productDto.Id = Guid.NewGuid();
                 Product product = _mapper.Map<Product>(productDto);
@@ -230,7 +230,7 @@ namespace ecommerce_server_side.Controllers
             {
                 if (productDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Invaild Model!");
+                    return BadRequest("Invalid Model!");
                 }
 
                 var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id, "ProductImages,Tags,Colors,Sizes");

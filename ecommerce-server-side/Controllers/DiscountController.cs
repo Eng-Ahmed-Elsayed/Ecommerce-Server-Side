@@ -29,7 +29,7 @@ namespace ecommerce_server_side.Controllers
             {
                 if (discountDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Discount is invaild.");
+                    return BadRequest("Discount is invalid.");
                 }
                 discountDto.Id = Guid.NewGuid();
                 Discount discount = _mapper.Map<Discount>(discountDto);
@@ -58,7 +58,7 @@ namespace ecommerce_server_side.Controllers
             {
                 if (discountDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Invaild Model!");
+                    return BadRequest("Invalid Model!");
                 }
 
                 var discount = await _unitOfWork.Discount.GetAsync(c => c.Id == discountDto.Id);

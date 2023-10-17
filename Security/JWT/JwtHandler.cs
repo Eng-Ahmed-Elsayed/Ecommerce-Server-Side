@@ -40,6 +40,7 @@ namespace Security.JWT
             new Claim(ClaimTypes.Email, user.Email),
             new Claim("imgPath", user.ImgPath == null? "" : user.ImgPath),
             new Claim(ClaimTypes.NameIdentifier, user.UserName),
+            new Claim("id", user.Id),
 
         };
             var roles = await _userManager.GetRolesAsync(user);

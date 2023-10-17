@@ -71,7 +71,7 @@ namespace ecommerce_server_side.Controllers
             {
                 if (categoryDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Category is invaild.");
+                    return BadRequest("Category is invalid.");
                 }
                 categoryDto.Id = Guid.NewGuid();
                 Category category = _mapper.Map<Category>(categoryDto);
@@ -125,7 +125,7 @@ namespace ecommerce_server_side.Controllers
             {
                 if (categoryDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Invaild Model!");
+                    return BadRequest("Invalid Model!");
                 }
 
                 var category = await _unitOfWork.Category.GetAsync(c => c.Id == categoryDto.Id);

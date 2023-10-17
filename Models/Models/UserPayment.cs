@@ -19,12 +19,12 @@ namespace Models.Models
 
         [Required]
         [StringLength(16)]
-        public int AccountNo { get; set; }
+        public string AccountNo { get; set; }
         [Required]
-        public DateTime Expiry { get; set; }
+        public string Expiry { get; set; }
         [Required]
         [StringLength(3)]
-        public int Cvv { get; set; }
+        public string Cvv { get; set; }
 
         [Required]
         public DateTime? CreatedAt { get; set; }

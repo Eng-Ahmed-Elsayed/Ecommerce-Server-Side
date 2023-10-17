@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.DataTransferObjects.Shared;
 using Models.Models;
@@ -7,7 +8,8 @@ using Models.Models;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/user-payment")]
+    [Route("api/user/payment")]
+    [Authorize]
     [ApiController]
     public class UserPaymentController : ControllerBase
     {
@@ -29,8 +31,9 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var userPayment = await _unitOfWork.UserPayment.GetAsync(c =>
-                (c.Id == id && c.IsDeleted != true), "User");
+                var userId = User.FindFirst("id")?.Value;
+                var userPayment = await _unitOfWork.UserPayment.GetAsync(e =>
+                (e.Id == id && e.UserId == userId && e.IsDeleted != true), "User");
                 if (userPayment == null)
                 {
                     return NotFound();
@@ -45,12 +48,13 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpGet]
-        [Route("list")]
         public async Task<IActionResult> UserPaymentList()
         {
             try
             {
-                var userPayments = await _unitOfWork.UserPayment.GetListAsync(c => c.IsDeleted != true);
+                var userId = User.FindFirst("id")?.Value;
+                var userPayments = await _unitOfWork.UserPayment.GetListAsync(e =>
+                e.IsDeleted != true && e.UserId == userId);
                 var userPaymentsResult = _mapper.Map<IEnumerable<UserPaymentDto>>(userPayments);
                 return Ok(userPaymentsResult);
             }
@@ -61,19 +65,19 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpPost]
-        [Route("add")]
         public async Task<IActionResult> AddUserPayment([FromBody] UserPaymentDto? userPaymentDto)
         {
             try
             {
                 if (userPaymentDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("UserPayment is invaild.");
+                    return BadRequest("UserPayment is invalid.");
                 }
+
                 userPaymentDto.Id = Guid.NewGuid();
+                userPaymentDto.UserId = User.FindFirst("id")?.Value;
                 UserPayment userPayment = _mapper.Map<UserPayment>(userPaymentDto);
                 userPayment.CreatedAt = DateTime.Now;
-                userPayment.Provider = "Test Provider";
                 bool result = await _unitOfWork.UserPayment.AddAsync(userPayment);
                 if (result)
                 {
@@ -97,18 +101,20 @@ namespace ecommerce_server_side.Controllers
             {
                 if (userPaymentDto == null || !ModelState.IsValid)
                 {
-                    return BadRequest("Invaild Model!");
+                    return BadRequest("Invalid Model!");
                 }
 
-                var userPayment = await _unitOfWork.UserPayment.GetAsync(c => c.Id == userPaymentDto.Id);
+                var userId = User.FindFirst("id")?.Value;
+                var userPayment = await _unitOfWork.UserPayment.GetAsync(e =>
+                e.Id == userPaymentDto.Id && e.UserId == userId);
                 if (userPayment == null)
                 {
-                    return NotFound();
+                    return NotFound("User payment does not exist");
                 }
 
                 // Update fields
                 userPayment.Name = userPaymentDto.Name;
-                //userPayment.Provider = userPaymentDto.Provider;
+                userPayment.Provider = userPaymentDto.Provider;
                 userPayment.AccountNo = userPaymentDto.AccountNo;
                 userPayment.Expiry = userPaymentDto.Expiry;
                 userPayment.Cvv = userPaymentDto.Cvv;
@@ -130,10 +136,12 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var userPayment = await _unitOfWork.UserPayment.GetAsync(c => c.Id == id && c.IsDeleted != true);
+                var userId = User.FindFirst("id")?.Value;
+                var userPayment = await _unitOfWork.UserPayment.GetAsync(e =>
+                e.Id == id && e.IsDeleted != true && e.UserId == userId);
                 if (userPayment == null)
                 {
-                    return NotFound("The userPayment is not exist");
+                    return NotFound("User payment does not exist");
                 }
 
                 // Delete the userPayment
@@ -148,31 +156,6 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
-        [HttpDelete]
-        [Route("")]
-        public async Task<IActionResult> DeleteUserPaymentRange([FromBody] UserPaymentDto[] userPaymentDtos)
-        {
-            try
-            {
-                foreach (var userPaymentDto in userPaymentDtos)
-                {
-                    var userPayment = await _unitOfWork.UserPayment.GetAsync(c => c.Id == userPaymentDto.Id && c.IsDeleted != true);
-                    if (userPayment == null)
-                    {
-                        return NotFound("The userPayment does not exist");
-                    }
-                    // Delete the userPayment
-                    userPayment.IsDeleted = true;
-                    userPayment.DeletedAt = DateTime.Now;
-                }
 
-                await _unitOfWork.SaveAsync();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex}");
-            }
-        }
     }
 }

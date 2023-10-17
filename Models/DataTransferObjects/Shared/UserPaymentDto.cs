@@ -7,7 +7,7 @@ namespace Models.DataTransferObjects.Shared
     {
         public Guid Id { get; set; }
         public string? UserId { get; set; }
-        public UserDto? User { get; }
+        public UserDto? User { get; set; }
 
         [Required]
         public string Provider { get; set; }
@@ -18,11 +18,13 @@ namespace Models.DataTransferObjects.Shared
 
         [Required]
         [StringLength(16)]
-        public int AccountNo { get; set; }
+        public string AccountNo { get; set; }
         [Required]
-        public DateTime Expiry { get; set; }
+        public string Expiry { get; set; }
         [Required]
         [StringLength(3)]
-        public int Cvv { get; set; }
+        public string Cvv { get; set; }
+
+        public bool? Remember { get; set; }
     }
 }

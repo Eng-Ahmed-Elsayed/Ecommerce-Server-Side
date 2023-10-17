@@ -8,6 +8,12 @@ namespace Models.Models
         public string? UserId { get; set; }
         public User? User { get; set; }
         [Required]
+        [StringLength(40, ErrorMessage = "First Name length can't be more than 40.")]
+        public string FirstName { get; set; }
+        [Required]
+        [StringLength(40, ErrorMessage = "Last Name length can't be more than 40.")]
+        public string LastName { get; set; }
+        [Required]
         [StringLength(80, ErrorMessage = "AddressLine1 length can't be more than 80.")]
         public string AddressLine1 { get; set; }
 
@@ -26,11 +32,12 @@ namespace Models.Models
         [Required]
         [MinLength(4)]
         [MaxLength(10)]
-        public int PostalCode { get; set; }
+        public string PostalCode { get; set; }
         [Phone]
         [MinLength(4)]
         [MaxLength(25)]
         public string? Telephone { get; set; }
+        [Required]
         [MinLength(4)]
         [MaxLength(25)]
         [Phone]
