@@ -10,7 +10,7 @@
         IOrderItemRepository OrderItem { get; }
         IPaymentDetailsRepository PaymentDetails { get; }
         IProductRepository Product { get; }
-        IShoppingSessionRepository ShoppingSession { get; }
+        IShoppingCartRepository ShoppingCart { get; }
         IUserAddressRepository UserAddress { get; }
         IUserPaymentRepository UserPayment { get; }
         ITagRepository Tag { get; }

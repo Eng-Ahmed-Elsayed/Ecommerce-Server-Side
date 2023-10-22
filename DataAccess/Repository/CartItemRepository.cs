@@ -11,6 +11,16 @@ namespace DataAccess.Repository
         {
             _db = db;
         }
+        //public async Task<bool> UpdateAsync(CartItem cartItem)
+        //{
+        //    if (cartItem == null) { return await Task.FromResult(false); }
+        //    cartItem.UpdatedAt = DateTime.Now;
+        //    _db.CartItems.Attach(cartItem);
+        //    _db.Entry(cartItem).Property(x => x.Quantity).IsModified = true;
+        //    _db.Entry(cartItem).Property(x => x.UpdatedAt).IsModified = true;
+        //    return await Task.FromResult(true);
+
+        //}
         public async Task<bool> UpdateAsync(CartItem cartItem)
         {
             if (cartItem == null) { return await Task.FromResult(false); }

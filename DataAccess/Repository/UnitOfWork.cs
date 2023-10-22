@@ -15,7 +15,7 @@ namespace DataAccess.Repository
         public IOrderItemRepository OrderItem { get; private set; }
         public IPaymentDetailsRepository PaymentDetails { get; private set; }
         public IProductRepository Product { get; private set; }
-        public IShoppingSessionRepository ShoppingSession { get; private set; }
+        public IShoppingCartRepository ShoppingCart { get; private set; }
         public IUserAddressRepository UserAddress { get; private set; }
         public IUserPaymentRepository UserPayment { get; private set; }
         public IColorRepository Color { get; private set; }
@@ -34,7 +34,7 @@ namespace DataAccess.Repository
             OrderItem = new OrderItemRepository(_db);
             PaymentDetails = new PaymentDetailsRepository(_db);
             Product = new ProductRepository(_db);
-            ShoppingSession = new ShoppingSessionRepository(_db);
+            ShoppingCart = new ShoppingCartRepository(_db);
             UserAddress = new UserAddressRepository(_db);
             UserPayment = new UserPaymentRepository(_db);
             Color = new ColorRepository(_db);

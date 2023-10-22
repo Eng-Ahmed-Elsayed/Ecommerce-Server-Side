@@ -39,9 +39,9 @@ namespace DataAccess.Data
             .IsRequired();
 
             modelBuilder.Entity<User>()
-            .HasOne<ShoppingSession>()
+            .HasOne<ShoppingCart>()
             .WithOne()
-            .HasForeignKey<ShoppingSession>(e => e.UserId);
+            .HasForeignKey<ShoppingCart>(e => e.UserId);
 
             // Product relations
             modelBuilder.Entity<Category>()
@@ -73,9 +73,11 @@ namespace DataAccess.Data
             .HasOne<OrderItem>()
             .WithOne();
 
-            modelBuilder.Entity<Product>()
-            .HasOne<CartItem>()
-            .WithOne();
+            modelBuilder.Entity<CartItem>()
+            .HasOne(e => e.Product)
+            .WithMany()
+            .HasForeignKey(e => e.ProductId)
+            .IsRequired();
 
             modelBuilder.Entity<Product>()
             .HasMany(e => e.Tags)
@@ -103,10 +105,12 @@ namespace DataAccess.Data
             .WithOne()
             .OnDelete(DeleteBehavior.Restrict);
 
-            // ShoppingSession with CartItem
-            modelBuilder.Entity<ShoppingSession>()
-            .HasMany<CartItem>()
-            .WithOne();
+            // ShoppingCart with CartItem
+            modelBuilder.Entity<ShoppingCart>()
+            .HasMany(e => e.CartItems)
+            .WithOne()
+            .HasForeignKey(e => e.ShoppingCartId)
+            .IsRequired();
         }
 
         public DbSet<CartItem> CartItems { get; set; }
@@ -117,7 +121,7 @@ namespace DataAccess.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<PaymentDetails> PaymentsDetails { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ShoppingSession> ShoppingSessions { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
         public DbSet<UserPayment> UserPayments { get; set; }
         public DbSet<Color> Colors { get; set; }

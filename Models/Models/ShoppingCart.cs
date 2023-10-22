@@ -4,22 +4,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Models.Models
 {
-    public class CartItem
+    public class ShoppingCart
     {
         public Guid Id { get; set; }
-        public Guid ShoppingCartId { get; set; }
-        public Guid ProductId { get; set; }
-        public Product Product { get; }
-        [Required]
-        [Range(1, 99999)]
-        public int Quantity { get; set; }
+        public string? UserId { get; set; }
+        public List<CartItem>? CartItems { get; } = new();
+
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Precision(18, 2)]
-        public decimal? Price
+        public decimal? Total
         {
             get
             {
-                return Product.Price * Quantity;
+                decimal? total = 0;
+                foreach (var item in CartItems)
+                {
+                    total += item.Price;
+                }
+                return total;
             }
         }
 

@@ -42,7 +42,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"Internal server error");
             }
         }
 
@@ -59,7 +59,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"Internal server error");
             }
         }
 
@@ -87,7 +87,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"Internal server error");
             }
         }
 
@@ -133,7 +133,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"Internal server error");
             }
         }
 
@@ -160,7 +160,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"Internal server error");
             }
         }
     }
