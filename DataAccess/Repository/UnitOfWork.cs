@@ -13,7 +13,7 @@ namespace DataAccess.Repository
         public IInventoryRepository Inventory { get; private set; }
         public IOrderDetailsRepository OrderDetails { get; private set; }
         public IOrderItemRepository OrderItem { get; private set; }
-        public IPaymentDetailsRepository PaymentDetails { get; private set; }
+        public IShippingOptionRepository ShippingOption { get; private set; }
         public IProductRepository Product { get; private set; }
         public IShoppingCartRepository ShoppingCart { get; private set; }
         public IUserAddressRepository UserAddress { get; private set; }
@@ -32,7 +32,7 @@ namespace DataAccess.Repository
             Inventory = new InventoryRepository(_db);
             OrderDetails = new OrderDetailsRepository(_db);
             OrderItem = new OrderItemRepository(_db);
-            PaymentDetails = new PaymentDetailsRepository(_db);
+            ShippingOption = new ShippingOptionRepository(_db);
             Product = new ProductRepository(_db);
             ShoppingCart = new ShoppingCartRepository(_db);
             UserAddress = new UserAddressRepository(_db);

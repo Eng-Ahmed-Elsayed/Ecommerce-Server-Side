@@ -1,17 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Models.Models
 {
-    public class PaymentDetails
+    public class ShippingOption
     {
         public Guid Id { get; set; }
-        public Guid OrderDetailsId { get; set; }
         [Required]
-        public int Amount { get; set; }
+        public string Method { get; set; }
         [Required]
-        public string Provider { get; set; }
+        [Precision(8, 2)]
+        public decimal Cost { get; set; }
         [Required]
-        public string Status { get; set; }
+        public string DeliveryTime { get; set; }
 
 
         [Required]

@@ -10,8 +10,14 @@ namespace Models.Models
         [Required]
         [Precision(18, 2)]
         public decimal Total { get; set; }
-        public Guid PaymentId { get; set; }
-        public ICollection<OrderItem> OrderItems { get; } = new List<OrderItem>();
+        public ICollection<OrderItem>? OrderItems { get; } = new List<OrderItem>();
+
+        public Guid ShippingOptionId { get; set; }
+        public ShippingOption? ShippingOption { get; }
+        public Guid UserAddressId { get; set; }
+        public UserAddress? UserAddress { get; }
+        public Guid UserPaymentId { get; set; }
+        public UserPayment? UserPayment { get; }
 
 
         [Required]

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.DataTransferObjects.Shared;
 using Models.Models;
@@ -7,6 +8,7 @@ using Models.Models;
 namespace ecommerce_server_side.Controllers
 {
     [Route("api/discount")]
+    [Authorize]
     [ApiController]
     public class DiscountController : ControllerBase
     {
@@ -21,8 +23,48 @@ namespace ecommerce_server_side.Controllers
         }
 
         // <-------Discount Actions------->
+        [HttpGet]
+        public async Task<IActionResult> DiscountList()
+        {
+            try
+            {
+                var discounts = await _unitOfWork.Discount.GetListAsync(c => c.IsDeleted != true);
+                var discountsResult = _mapper.Map<IEnumerable<DiscountDto>>(discounts);
+                return Ok(discountsResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetDiscount([FromRoute] Guid id)
+        {
+            try
+            {
+                var discount = await _unitOfWork.Discount.GetAsync(c =>
+                (c.Id == id && c.IsDeleted != true), "Products.ProductImages");
+                if (discount == null)
+                {
+                    return NotFound();
+                }
+                var discountResult = _mapper.Map<DiscountDto>(discount);
+
+                var otherProducts = await _unitOfWork.Product
+                    .GetListAsync(p =>
+                    (p.DiscoutId != discount.Id && p.IsDeleted != true), "ProductImages");
+                discountResult.OtherProducts = _mapper.Map<List<ProductDto>>(otherProducts);
+                return Ok(discountResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
         [HttpPost]
-        [Route("add")]
         public async Task<IActionResult> AddDiscount([FromBody] DiscountDto? discountDto)
         {
             try
@@ -97,47 +139,7 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("list")]
-        public async Task<IActionResult> DiscountList()
-        {
-            try
-            {
-                var discounts = await _unitOfWork.Discount.GetListAsync(c => c.IsDeleted != true);
-                var discountsResult = _mapper.Map<IEnumerable<DiscountDto>>(discounts);
-                return Ok(discountsResult);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex}");
-            }
-        }
 
-        [HttpGet]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> GetDiscount([FromRoute] Guid id)
-        {
-            try
-            {
-                var discount = await _unitOfWork.Discount.GetAsync(c =>
-                (c.Id == id && c.IsDeleted != true), "Products.ProductImages");
-                if (discount == null)
-                {
-                    return NotFound();
-                }
-                var discountResult = _mapper.Map<DiscountDto>(discount);
-
-                var otherProducts = await _unitOfWork.Product
-                    .GetListAsync(p =>
-                    (p.DiscoutId != discount.Id && p.IsDeleted != true), "ProductImages");
-                discountResult.OtherProducts = _mapper.Map<List<ProductDto>>(otherProducts);
-                return Ok(discountResult);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex}");
-            }
-        }
 
         [HttpDelete]
         [Route("{id:Guid}")]
@@ -148,7 +150,7 @@ namespace ecommerce_server_side.Controllers
                 var discount = await _unitOfWork.Discount.GetAsync(c => c.Id == id && c.IsDeleted != true);
                 if (discount == null)
                 {
-                    return NotFound("The discount is not exist");
+                    return NotFound("The discount does not exist");
                 }
 
                 // Delete the discount
@@ -164,7 +166,6 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpDelete]
-        [Route("")]
         public async Task<IActionResult> DeleteDiscountRange([FromBody] DiscountDto[] discountDtos)
         {
             try

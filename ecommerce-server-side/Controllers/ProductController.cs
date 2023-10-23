@@ -61,7 +61,6 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpGet]
-        [Route("list")]
         public async Task<IActionResult> ProductList()
         {
             try
@@ -78,8 +77,8 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpPost]
-        [Route("add")]
         [Authorize(Roles = "Administrator")]
+
         public async Task<IActionResult> AddProduct([FromBody] ProductDto? productDto)
         {
             try

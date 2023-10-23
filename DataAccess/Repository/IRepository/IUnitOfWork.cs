@@ -8,7 +8,7 @@
         IInventoryRepository Inventory { get; }
         IOrderDetailsRepository OrderDetails { get; }
         IOrderItemRepository OrderItem { get; }
-        IPaymentDetailsRepository PaymentDetails { get; }
+        IShippingOptionRepository ShippingOption { get; }
         IProductRepository Product { get; }
         IShoppingCartRepository ShoppingCart { get; }
         IUserAddressRepository UserAddress { get; }

@@ -16,10 +16,13 @@ namespace DataAccess.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            //Roles Config
+            // Roles Config
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
 
-            //User relations
+            // Shipping options Config
+            modelBuilder.ApplyConfiguration(new ShippingOptionConfiguration());
+
+            // User relations
             modelBuilder.Entity<User>()
             .HasMany(e => e.UserAddresses)
             .WithOne(e => e.User)
@@ -61,7 +64,6 @@ namespace DataAccess.Data
             .WithOne()
             .HasForeignKey(e => e.DiscoutId)
             .IsRequired(false);
-            //.WithOne(e => e.Discount)
 
             modelBuilder.Entity<Product>()
            .HasMany(e => e.ProductImages)
@@ -99,11 +101,6 @@ namespace DataAccess.Data
             .HasForeignKey(e => e.OrderDetailsId)
             .IsRequired();
 
-            // OrderDetails with PaymentDetails
-            modelBuilder.Entity<PaymentDetails>()
-            .HasOne<OrderDetails>()
-            .WithOne()
-            .OnDelete(DeleteBehavior.Restrict);
 
             // ShoppingCart with CartItem
             modelBuilder.Entity<ShoppingCart>()
@@ -111,6 +108,31 @@ namespace DataAccess.Data
             .WithOne()
             .HasForeignKey(e => e.ShoppingCartId)
             .IsRequired();
+
+            // OrderDetails Relations
+            // OrderDetails with ShippingOption
+            modelBuilder.Entity<OrderDetails>()
+            .HasOne(e => e.ShippingOption)
+            .WithMany()
+            .HasForeignKey(e => e.ShippingOptionId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(true);
+
+            // OrderDetails with UserAddress
+            modelBuilder.Entity<OrderDetails>()
+            .HasOne(e => e.UserAddress)
+            .WithMany()
+            .HasForeignKey(e => e.UserAddressId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(true);
+
+            // OrderDetails with UserPayment
+            modelBuilder.Entity<OrderDetails>()
+            .HasOne(e => e.UserPayment)
+            .WithMany()
+            .HasForeignKey(e => e.UserPaymentId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(true);
         }
 
         public DbSet<CartItem> CartItems { get; set; }
@@ -119,7 +141,7 @@ namespace DataAccess.Data
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<OrderDetails> OrdersDetails { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<PaymentDetails> PaymentsDetails { get; set; }
+        public DbSet<ShippingOption> ShippingOptions { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }

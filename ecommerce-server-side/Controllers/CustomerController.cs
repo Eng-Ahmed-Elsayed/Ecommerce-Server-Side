@@ -177,6 +177,8 @@ namespace ecommerce_server_side.Controllers
                                     && x.IsDeleted != true);
                             if (cartItem != null)
                             {
+                                // Will not work after we UpdateAsync again but we do not need
+                                // this end point for now and it would be updated later.
                                 await _unitOfWork.CartItem.UpdateAsync(_mapper.Map<CartItem>(cartItemDto));
                             }
                         });

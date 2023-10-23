@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231023123636_AddShippingOptionAndUpdateOrderDetailsRealtions")]
+    partial class AddShippingOptionAndUpdateOrderDetailsRealtions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -539,42 +542,16 @@ namespace DataAccess.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Method")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("ShippingOptions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("48ea541f-3ae3-4c10-9e52-6d43a2a33c5b"),
-                            Cost = 5.99m,
-                            CreatedAt = new DateTime(2023, 10, 23, 15, 51, 0, 956, DateTimeKind.Local).AddTicks(7042),
-                            DeliveryTime = "3-5 business days",
-                            Method = "Standard Shipping"
-                        },
-                        new
-                        {
-                            Id = new Guid("47d3d393-b3aa-43a3-8f06-64387ba6bb8d"),
-                            Cost = 9.99m,
-                            CreatedAt = new DateTime(2023, 10, 23, 15, 51, 0, 956, DateTimeKind.Local).AddTicks(7131),
-                            DeliveryTime = "2-3 business days",
-                            Method = "Expedited Shipping"
-                        },
-                        new
-                        {
-                            Id = new Guid("60046871-ba3e-4a2b-b02a-221075b3f9e4"),
-                            Cost = 19.99m,
-                            CreatedAt = new DateTime(2023, 10, 23, 15, 51, 0, 956, DateTimeKind.Local).AddTicks(7136),
-                            DeliveryTime = "1 business day",
-                            Method = "Overnight Shipping"
-                        });
                 });
 
             modelBuilder.Entity("Models.Models.ShoppingCart", b =>
