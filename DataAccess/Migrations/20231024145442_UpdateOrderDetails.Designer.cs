@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231024145442_UpdateOrderDetails")]
+    partial class UpdateOrderDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -373,7 +376,8 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserAddressId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.HasIndex("UserPaymentId");
 
@@ -594,7 +598,9 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("ShoppingCarts");
                 });
@@ -980,8 +986,8 @@ namespace DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("Models.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne()
+                        .HasForeignKey("Models.Models.OrderDetails", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1000,7 +1006,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Models.Models.OrderItem", b =>
                 {
-                    b.HasOne("Models.Models.OrderDetails", null)
+                    b.HasOne("Models.Models.OrderDetails", "OrderDetails")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderDetailsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1011,6 +1017,8 @@ namespace DataAccess.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("OrderDetails");
 
                     b.Navigation("Product");
                 });
@@ -1044,8 +1052,8 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Models.Models.ShoppingCart", b =>
                 {
                     b.HasOne("Models.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne()
+                        .HasForeignKey("Models.Models.ShoppingCart", "UserId");
                 });
 
             modelBuilder.Entity("Models.Models.UserAddress", b =>

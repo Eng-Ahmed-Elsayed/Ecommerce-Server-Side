@@ -36,15 +36,15 @@ namespace DataAccess.Data
             .IsRequired(false);
 
             modelBuilder.Entity<User>()
-            .HasOne<OrderDetails>()
+            .HasMany<OrderDetails>()
             .WithOne()
-            .HasForeignKey<OrderDetails>(e => e.UserId)
+            .HasForeignKey(e => e.UserId)
             .IsRequired();
 
             modelBuilder.Entity<User>()
-            .HasOne<ShoppingCart>()
+            .HasMany<ShoppingCart>()
             .WithOne()
-            .HasForeignKey<ShoppingCart>(e => e.UserId);
+            .HasForeignKey(e => e.UserId);
 
             // Product relations
             modelBuilder.Entity<Category>()
@@ -71,9 +71,11 @@ namespace DataAccess.Data
            .HasForeignKey(e => e.ProductId)
            .IsRequired(false);
 
-            modelBuilder.Entity<Product>()
-            .HasOne<OrderItem>()
-            .WithOne();
+            modelBuilder.Entity<OrderItem>()
+            .HasOne(e => e.Product)
+            .WithMany()
+            .HasForeignKey(e => e.ProductId)
+            .IsRequired();
 
             modelBuilder.Entity<CartItem>()
             .HasOne(e => e.Product)
@@ -97,7 +99,7 @@ namespace DataAccess.Data
             // OrderDetails with OrderItem
             modelBuilder.Entity<OrderDetails>()
             .HasMany(e => e.OrderItems)
-            .WithOne(e => e.OrderDetails)
+            .WithOne()
             .HasForeignKey(e => e.OrderDetailsId)
             .IsRequired();
 

@@ -9,7 +9,7 @@ using Utility.ManageFiles;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/product")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {

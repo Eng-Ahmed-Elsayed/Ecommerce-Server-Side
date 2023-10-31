@@ -8,7 +8,7 @@ using Utility.ManageFiles;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
     public class CategoryController : ControllerBase
     {

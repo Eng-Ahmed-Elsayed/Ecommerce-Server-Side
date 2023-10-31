@@ -7,7 +7,7 @@ using Models.Models;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/user/address")]
+    [Route("api/users/addresses")]
     [Authorize]
     [ApiController]
     public class UserAddressController : ControllerBase

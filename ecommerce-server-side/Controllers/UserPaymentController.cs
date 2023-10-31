@@ -8,7 +8,7 @@ using Models.Models;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/user/payment")]
+    [Route("api/users/payments")]
     [Authorize]
     [ApiController]
     public class UserPaymentController : ControllerBase
@@ -33,7 +33,9 @@ namespace ecommerce_server_side.Controllers
             {
                 var userId = User.FindFirst("id")?.Value;
                 var userPayment = await _unitOfWork.UserPayment.GetAsync(e =>
-                (e.Id == id && e.UserId == userId && e.IsDeleted != true), "User");
+                                    e.Id == id
+                                    && e.UserId == userId
+                                    && e.IsDeleted != true, "User");
                 if (userPayment == null)
                 {
                     return NotFound();

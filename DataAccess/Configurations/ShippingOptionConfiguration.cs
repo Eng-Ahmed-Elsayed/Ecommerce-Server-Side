@@ -15,7 +15,7 @@ namespace DataAccess.Configurations
                     Method = "Standard Shipping",
                     DeliveryTime = "3-5 business days",
                     Cost = new decimal(5.99),
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = new DateTime(2023, 10, 24, 17, 22, 10, 623, DateTimeKind.Local).AddTicks(8786),
 
                 }
                 , new ShippingOption
@@ -24,7 +24,7 @@ namespace DataAccess.Configurations
                     Method = "Expedited Shipping",
                     DeliveryTime = "2-3 business days",
                     Cost = new decimal(9.99),
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = new DateTime(2023, 10, 24, 17, 22, 10, 623, DateTimeKind.Local).AddTicks(8786),
                 }
                 , new ShippingOption
                 {
@@ -32,7 +32,7 @@ namespace DataAccess.Configurations
                     Method = "Overnight Shipping",
                     DeliveryTime = "1 business day",
                     Cost = new decimal(19.99),
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = new DateTime(2023, 10, 24, 17, 22, 10, 623, DateTimeKind.Local).AddTicks(8786)
                 }
                 );
         }

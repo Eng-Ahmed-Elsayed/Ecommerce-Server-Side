@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Models.Models
@@ -7,10 +8,22 @@ namespace Models.Models
     {
         public Guid Id { get; set; }
         public string? UserId { get; set; }
-        [Required]
-        [Precision(18, 2)]
-        public decimal Total { get; set; }
         public ICollection<OrderItem>? OrderItems { get; } = new List<OrderItem>();
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Precision(18, 2)]
+        public decimal? Total
+        {
+            get
+            {
+                decimal? total = 0;
+                foreach (var item in OrderItems)
+                {
+                    total += item.Price;
+                }
+                return total;
+            }
+        }
 
         public Guid ShippingOptionId { get; set; }
         public ShippingOption? ShippingOption { get; }

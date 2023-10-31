@@ -7,7 +7,7 @@ using Models.Models;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/user")]
+    [Route("api/users")]
     [Authorize]
     [ApiController]
     public class CustomerController : ControllerBase
@@ -22,7 +22,7 @@ namespace ecommerce_server_side.Controllers
 
         }
 
-        [Route("cart")]
+        [Route("carts")]
         [HttpGet]
         public async Task<IActionResult> CartReview()
         {
@@ -32,19 +32,21 @@ namespace ecommerce_server_side.Controllers
                 {
                     var userId = User.FindFirst("id")?.Value;
                     var shoppingCart = await _unitOfWork.ShoppingCart.GetAsync(x =>
-                    x.UserId == userId && x.IsDeleted != true, "CartItems.Product.ProductImages,CartItems.Product.Inventory");
-                    if (shoppingCart != null)
+                    x.UserId == userId && x.IsDeleted != true
+                    , "CartItems.Product.ProductImages,CartItems.Product.Inventory");
+
+                    // If the user does not have shopping cart create one.
+                    if (shoppingCart == null)
                     {
-                        // You need to check if the cart item and the product is available first
-                        // and if not delete it from the cart.
-                        var availableCartItems = shoppingCart.CartItems.RemoveAll(x =>
-                                                        x.IsDeleted == true
-                                                        || x.Product.IsDeleted == true
-                                                        || x.Product.Inventory.Quantity <= 0);
-                        await _unitOfWork.SaveAsync();
-                        var shoppingCartResult = _mapper.Map<ShoppingCartDto>(shoppingCart);
-                        return Ok(shoppingCartResult);
+                        shoppingCart = await CreateShoppingCart(shoppingCart, userId);
+                        if (shoppingCart == null)
+                        {
+                            return BadRequest("Can't create a shopping cart.");
+                        }
                     }
+                    await DeleteNotAvailableCartItems(shoppingCart);
+                    var shoppingCartResult = _mapper.Map<ShoppingCartDto>(shoppingCart);
+                    return Ok(shoppingCartResult);
                 }
                 return BadRequest();
             }
@@ -55,7 +57,37 @@ namespace ecommerce_server_side.Controllers
 
         }
 
-        [Route("cart")]
+        // Check if the cart item and the product is available first
+        // and if not delete it from the cart.
+        private async Task DeleteNotAvailableCartItems(ShoppingCart shoppingCart)
+        {
+            shoppingCart.CartItems.RemoveAll(x =>
+                                            x.IsDeleted == true
+                                            || x.Product.IsDeleted == true
+                                            || x.Product.Inventory.Quantity <= 0);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private async Task<ShoppingCart> CreateShoppingCart(ShoppingCart shoppingCart, string userId)
+        {
+
+            shoppingCart = new ShoppingCart()
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                CreatedAt = DateTime.Now,
+            };
+            var result = await _unitOfWork.ShoppingCart.AddAsync(shoppingCart);
+            if (result)
+            {
+                await _unitOfWork.SaveAsync();
+                return shoppingCart;
+            }
+            return null;
+
+        }
+
+        [Route("carts")]
         [HttpPost]
         public async Task<IActionResult> AddCartItem([FromBody] CartItemDto cartItemDto)
         {
@@ -66,32 +98,15 @@ namespace ecommerce_server_side.Controllers
                     var userId = User.FindFirst("id")?.Value;
                     var shoppingCart = await _unitOfWork.ShoppingCart.GetAsync(x =>
                     x.UserId == userId && x.IsDeleted != true);
-                    // If the user does not have shopping cart create one then add the cart item.
+                    // If the user does not have shopping cart create one.
                     if (shoppingCart == null)
                     {
-                        shoppingCart = new ShoppingCart()
-                        {
-                            Id = Guid.NewGuid(),
-                            UserId = userId,
-                            CreatedAt = DateTime.Now,
-                        };
-                        var addCartResult = await _unitOfWork.ShoppingCart.AddAsync(shoppingCart);
-                        // May need to save first.
-                        //await _unitOfWork.SaveAsync();
-                        if (!addCartResult)
+                        shoppingCart = await CreateShoppingCart(shoppingCart, userId);
+                        if (shoppingCart != null)
                         {
                             return BadRequest("Can't create a shopping cart.");
                         }
                     }
-                    // Check if this product is not in the shopping cart.
-                    //CartItem getCartItem = await _unitOfWork.CartItem.GetAsync(x =>
-                    //                        x.ProductId == cartItemDto.ProductId
-                    //                        && x.ShoppingCartId == shoppingCart.Id
-                    //                        && x.IsDeleted != true);
-                    //if (getCartItem != null)
-                    //{
-                    //    return BadRequest("This product is already in your shopping cart.");
-                    //}
                     // Check if this product is not out of stock
                     Product product = await _unitOfWork.Product.GetAsync(x =>
                     x.Id == cartItemDto.ProductId && x.IsDeleted != true, "Inventory");
@@ -102,6 +117,11 @@ namespace ecommerce_server_side.Controllers
                     // Add new cart item
                     cartItemDto.Id = Guid.NewGuid();
                     var cartItem = _mapper.Map<CartItem>(cartItemDto);
+                    // If the cartItem quantity bigger than the inventory make it equals to the inventory
+                    if (cartItemDto.Quantity > product.Inventory.Quantity)
+                    {
+                        cartItemDto.Quantity = product.Inventory.Quantity;
+                    }
                     cartItem.ShoppingCartId = shoppingCart.Id;
                     cartItem.CreatedAt = DateTime.Now;
                     var result = await _unitOfWork.CartItem.AddAsync(cartItem);
@@ -119,7 +139,7 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
-        [Route("cart")]
+        [Route("carts")]
         [HttpPatch]
         public async Task<IActionResult> UpdateCartItem([FromBody] CartItemDto cartItemDto)
         {
@@ -130,20 +150,26 @@ namespace ecommerce_server_side.Controllers
                     var userId = User.FindFirst("id")?.Value;
                     var shoppingCart = await _unitOfWork.ShoppingCart.GetAsync(x =>
                                         x.UserId == userId
-                                        && x.IsDeleted != true);
-
-                    var cartItem = await _unitOfWork.CartItem.GetAsync(x =>
+                                        && x.IsDeleted != true,
+                                        "CartItems.Product.Inventory");
+                    if (shoppingCart != null)
+                    {
+                        var cartItem = await _unitOfWork.CartItem.GetAsync(x =>
                                     x.Id == cartItemDto.Id
                                     && x.ShoppingCartId == shoppingCart.Id
                                     && x.IsDeleted != true);
-
-                    if (cartItem != null)
-                    {
-                        cartItem.Quantity = cartItemDto.Quantity;
-                        cartItem.UpdatedAt = DateTime.Now;
-                        await _unitOfWork.SaveAsync();
-                        return Ok();
+                        if (cartItem != null && cartItemDto.Quantity > 0)
+                        {
+                            // Can not update if the quantity is bigger than the inventory.
+                            cartItem.Quantity = cartItemDto.Quantity < cartItem.Product.Inventory.Quantity
+                            ? cartItemDto.Quantity
+                            : cartItem.Product.Inventory.Quantity;
+                            cartItem.UpdatedAt = DateTime.Now;
+                            await _unitOfWork.SaveAsync();
+                            return Ok();
+                        }
                     }
+
                 }
                 return BadRequest();
             }
@@ -153,7 +179,7 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
-        [Route("cart")]
+        [Route("carts")]
         [HttpPut]
         public async Task<IActionResult> UpdateShoppingCart([FromBody] ShoppingCartDto shoppingCartDto)
         {
@@ -194,7 +220,7 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
-        [Route("cart/{id:Guid}")]
+        [Route("carts/{id:Guid}")]
         [HttpDelete]
         public async Task<IActionResult> DeleteCartItem([FromRoute] Guid id)
         {
@@ -227,6 +253,88 @@ namespace ecommerce_server_side.Controllers
                 return StatusCode(500, $"Internal server error");
             }
         }
+
+        [HttpPost]
+        [Route("orders")]
+        public async Task<IActionResult> AddOrder([FromBody] OrderDetailsDto orderDetailsDto)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var userId = User.FindFirst("id")?.Value;
+                    // Every property should be exist and belong to the same uesr.
+                    var shoppingCart = await _unitOfWork.ShoppingCart.GetAsync(x =>
+                                        x.UserId == userId
+                                        && x.IsDeleted != true,
+                                        "CartItems.Product.Inventory");
+                    var userAddress = await _unitOfWork.UserAddress.GetAsync(e =>
+                                        e.Id == orderDetailsDto.UserAddressId
+                                        && e.UserId == userId
+                                        && e.IsDeleted != true);
+                    var userPayment = await _unitOfWork.UserPayment.GetAsync(e =>
+                                    e.Id == orderDetailsDto.UserPaymentId
+                                    && e.UserId == userId
+                                    && e.IsDeleted != true);
+
+                    // Check 1-if there is a shopping cart.
+                    // 2- The shopping cart has cart items.
+                    // 3- There is an available address for this user.
+                    // 4- There is an available payment for this user.
+                    if (shoppingCart != null
+                        && shoppingCart.CartItems.Count() > 0
+                        && userAddress != null
+                        && userPayment != null)
+                    {
+                        // Delete all unavailable Cart Items.
+                        await DeleteNotAvailableCartItems(shoppingCart);
+                        // New Id for the order
+                        var orderDetailsId = Guid.NewGuid();
+                        // Create New Order Details With New Order Items(cartItem => orderItem).
+                        shoppingCart.CartItems.ForEach(async cartItem =>
+                        {
+                            // Update the inventory quantity
+                            // Check if the Inventory.Quantity > cartItem.Quantity
+                            if (cartItem.Product.Inventory.Quantity > cartItem.Quantity)
+                            {
+                                cartItem.Product.Inventory.Quantity -= cartItem.Quantity;
+
+                            }
+                            else
+                            {
+                                cartItem.Quantity = cartItem.Product.Inventory.Quantity;
+                                cartItem.Product.Inventory.Quantity = 0;
+                            }
+                            // New orderItem
+                            OrderItem orderItem = _mapper.Map<OrderItem>(cartItem);
+                            orderItem.OrderDetailsId = orderDetailsId;
+                            orderItem.CreatedAt = DateTime.Now;
+                            await _unitOfWork.OrderItem.AddAsync(orderItem);
+                        });
+                        OrderDetails orderDetails = _mapper.Map<OrderDetails>(orderDetailsDto);
+                        orderDetails.Id = orderDetailsId;
+                        orderDetails.CreatedAt = DateTime.Now;
+                        orderDetails.UserId = userId;
+                        var result = await _unitOfWork.OrderDetails.AddAsync(orderDetails);
+                        if (result)
+                        {
+                            // Delete old shopping cart
+                            shoppingCart.IsDeleted = true;
+                            shoppingCart.DeletedAt = DateTime.Now;
+
+                            await _unitOfWork.SaveAsync();
+                            return Ok();
+                        }
+                    }
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error");
+            }
+        }
+
 
 
 

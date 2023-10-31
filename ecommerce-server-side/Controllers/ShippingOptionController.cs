@@ -7,7 +7,7 @@ using Models.Models;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/shipping-option")]
+    [Route("api/shipping-options")]
     [Authorize]
     [ApiController]
     public class ShippingOptionController : ControllerBase

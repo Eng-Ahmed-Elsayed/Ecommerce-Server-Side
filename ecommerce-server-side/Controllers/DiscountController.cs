@@ -7,7 +7,7 @@ using Models.Models;
 
 namespace ecommerce_server_side.Controllers
 {
-    [Route("api/discount")]
+    [Route("api/discounts")]
     [Authorize]
     [ApiController]
     public class DiscountController : ControllerBase
