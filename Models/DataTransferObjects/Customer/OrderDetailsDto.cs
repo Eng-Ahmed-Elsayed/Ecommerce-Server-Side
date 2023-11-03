@@ -21,5 +21,7 @@ namespace Models.DataTransferObjects.Customer
         [Required]
         public Guid UserPaymentId { get; set; }
         public UserPaymentDto? UserPayment { get; set; }
+        public DateTime? CreatedAt { get; set; }
+
     }
 }

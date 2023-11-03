@@ -335,6 +335,29 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("orders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            try
+            {
+                var userId = User.FindFirst("id")?.Value;
+                var orders = await _unitOfWork.OrderDetails.GetListAsync(x =>
+                                x.UserId == userId
+                                && x.IsDeleted != true,
+                                "OrderItems.Product.ProductImages");
+                if (orders != null)
+                {
+                    var ordersResult = _mapper.Map<IEnumerable<OrderDetailsDto>>(orders);
+                    return Ok(orders);
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
 
