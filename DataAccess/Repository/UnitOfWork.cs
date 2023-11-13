@@ -1,11 +1,14 @@
 ﻿using DataAccess.Data;
 using DataAccess.Repository.IRepository;
+using Models.DataQuerying;
+using Models.Models;
 
 namespace DataAccess.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
         private ApplicationDbContext _db;
+        private ISortHelper<Product> _productSortHelper;
 
         public ICartItemRepository CartItem { get; private set; }
         public ICategoryRepository Category { get; private set; }
@@ -23,9 +26,11 @@ namespace DataAccess.Repository
         public ISizeRepository Size { get; private set; }
         public IProductImageRepository ProductImage { get; private set; }
 
-        public UnitOfWork(ApplicationDbContext db)
+        public UnitOfWork(ApplicationDbContext db, ISortHelper<Product> productSortHelper)
         {
             _db = db;
+            _productSortHelper = productSortHelper;
+
             CartItem = new CartItemRepository(_db);
             Category = new CategoryRepository(_db);
             Discount = new DiscountRepository(_db);
@@ -33,7 +38,7 @@ namespace DataAccess.Repository
             OrderDetails = new OrderDetailsRepository(_db);
             OrderItem = new OrderItemRepository(_db);
             ShippingOption = new ShippingOptionRepository(_db);
-            Product = new ProductRepository(_db);
+            Product = new ProductRepository(_db, _productSortHelper);
             ShoppingCart = new ShoppingCartRepository(_db);
             UserAddress = new UserAddressRepository(_db);
             UserPayment = new UserPaymentRepository(_db);

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Models.DataQuerying;
 using Models.DataTransferObjects;
 using Models.Models;
 using Security.JWT;
@@ -37,6 +38,7 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
     opt.TokenLifespan = TimeSpan.FromHours(2);
 }); ;
 
+builder.Services.AddScoped<ISortHelper<Product>, SortHelper<Product>>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IManageFiles, ManageFiles>();
 

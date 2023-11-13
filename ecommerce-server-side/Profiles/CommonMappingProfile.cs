@@ -12,7 +12,6 @@ namespace Models.DataTransferObjects
 
             CreateMap<Category, CategoryDto>().ReverseMap();
             CreateMap<Product, ProductDto>().ReverseMap();
-            CreateMap<ProductDto, Product>();
             CreateMap<DiscountDto, Discount>().ReverseMap();
             CreateMap<Inventory, InventoryDto>().ReverseMap();
             CreateMap<ShippingOption, ShippingOptionDto>().ReverseMap();

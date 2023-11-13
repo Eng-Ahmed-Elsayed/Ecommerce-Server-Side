@@ -15,7 +15,7 @@ namespace Models.Models
         {
             get
             {
-                if (Quantity > 15) return "IN STOCK";
+                if (Quantity >= 15) return "IN STOCK";
                 else if (Quantity < 15 & Quantity > 0) return "LOW STOCK";
                 else return "OUT OF STOCK";
             }

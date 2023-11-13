@@ -3,8 +3,10 @@ using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Models.DataQuerying;
 using Models.DataTransferObjects.Shared;
 using Models.Models;
+using Newtonsoft.Json;
 using Utility.ManageFiles;
 
 namespace ecommerce_server_side.Controllers
@@ -61,11 +63,23 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProductList()
+        public async Task<IActionResult> ProductList([FromQuery] string? name)
         {
             try
             {
-                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true, "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                IEnumerable<Product> products;
+                if (name != null)
+                {
+                    products = await _unitOfWork.Product.GetListAsync(p =>
+                    p.Name.Contains(name) && p.IsDeleted != true
+                    , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+
+                }
+                else
+                {
+                    products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
+                            , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                }
                 var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
 
                 return Ok(productsResult);
@@ -75,6 +89,37 @@ namespace ecommerce_server_side.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+        [HttpGet]
+        [Route("search")]
+        public async Task<IActionResult> SearchAndFilterProducts([FromQuery] ProductParameters productParameters)
+        {
+            try
+            {
+                var products = await _unitOfWork.Product.GetPagedListAsync(productParameters,
+                            "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+
+                var metadata = new
+                {
+                    products.TotalCount,
+                    products.PageSize,
+                    products.CurrentPage,
+                    products.TotalPages,
+                    products.HasNext,
+                    products.HasPrevious
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                Response.Headers.Add("Access-Control-Expose-Headers", "X-Pagination");
+                var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
+                return Ok(productsResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
@@ -101,6 +146,12 @@ namespace ecommerce_server_side.Controllers
                 product.Colors = await UpdateProductColorsAsync(productDto.Colors);
                 product.Sizes = await UpdateProductSizesAsync(productDto.Sizes);
                 product.InventoryId = inventory.Id;
+                product.ProductImages = productDto.ProductImages.Select(x => new ProductImage
+                {
+                    Id = Guid.NewGuid(),
+                    ImgPath = x.ImgPath,
+                    ProductId = x.ProductId
+                }).ToList();
                 product.CreatedAt = DateTime.Now;
                 bool result = await _unitOfWork.Product.AddAsync(product);
                 if (result)
