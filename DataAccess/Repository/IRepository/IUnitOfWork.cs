@@ -17,6 +17,8 @@
         ISizeRepository Size { get; }
         IColorRepository Color { get; }
         IProductImageRepository ProductImage { get; }
+        ICheckListRepository CheckList { get; }
+        ICheckListItemRepository CheckListItem { get; }
 
         Task SaveAsync();
     }

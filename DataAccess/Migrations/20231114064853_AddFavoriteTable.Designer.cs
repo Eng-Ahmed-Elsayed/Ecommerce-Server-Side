@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231114064853_AddFavoriteTable")]
+    partial class AddFavoriteTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,71 +260,6 @@ namespace DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Models.Models.CheckList", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("CheckLists");
-                });
-
-            modelBuilder.Entity("Models.Models.CheckListItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CheckListId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CheckListId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CheckListItems");
-                });
-
             modelBuilder.Entity("Models.Models.Color", b =>
                 {
                     b.Property<Guid>("Id")
@@ -372,6 +310,37 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Discounts");
+                });
+
+            modelBuilder.Entity("Models.Models.Favorite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("Favorites");
                 });
 
             modelBuilder.Entity("Models.Models.Inventory", b =>
@@ -452,7 +421,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -505,6 +473,9 @@ namespace DataAccess.Migrations
                     b.Property<Guid?>("DiscoutId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("FavoriteId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("InStock")
                         .HasColumnType("bit");
 
@@ -548,6 +519,8 @@ namespace DataAccess.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("DiscoutId");
+
+                    b.HasIndex("FavoriteId");
 
                     b.HasIndex("InventoryId");
 
@@ -1031,28 +1004,11 @@ namespace DataAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Models.Models.CheckList", b =>
+            modelBuilder.Entity("Models.Models.Favorite", b =>
                 {
                     b.HasOne("Models.Models.User", null)
                         .WithOne()
-                        .HasForeignKey("Models.Models.CheckList", "UserId");
-                });
-
-            modelBuilder.Entity("Models.Models.CheckListItem", b =>
-                {
-                    b.HasOne("Models.Models.CheckList", null)
-                        .WithMany("CheckListItems")
-                        .HasForeignKey("CheckListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Models.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
+                        .HasForeignKey("Models.Models.Favorite", "UserId");
                 });
 
             modelBuilder.Entity("Models.Models.OrderDetails", b =>
@@ -1114,6 +1070,10 @@ namespace DataAccess.Migrations
                     b.HasOne("Models.Models.Discount", null)
                         .WithMany("Products")
                         .HasForeignKey("DiscoutId");
+
+                    b.HasOne("Models.Models.Favorite", null)
+                        .WithMany("Products")
+                        .HasForeignKey("FavoriteId");
 
                     b.HasOne("Models.Models.Inventory", "Inventory")
                         .WithMany("Products")
@@ -1186,12 +1146,12 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.Models.CheckList", b =>
+            modelBuilder.Entity("Models.Models.Discount", b =>
                 {
-                    b.Navigation("CheckListItems");
+                    b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("Models.Models.Discount", b =>
+            modelBuilder.Entity("Models.Models.Favorite", b =>
                 {
                     b.Navigation("Products");
                 });

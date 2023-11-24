@@ -25,6 +25,8 @@ namespace DataAccess.Repository
         public ITagRepository Tag { get; private set; }
         public ISizeRepository Size { get; private set; }
         public IProductImageRepository ProductImage { get; private set; }
+        public ICheckListRepository CheckList { get; private set; }
+        public ICheckListItemRepository CheckListItem { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, ISortHelper<Product> productSortHelper)
         {
@@ -46,6 +48,8 @@ namespace DataAccess.Repository
             Tag = new TagRepository(_db);
             Size = new SizeRepository(_db);
             ProductImage = new ProductImageRepository(_db);
+            CheckList = new CheckListRepository(_db);
+            CheckListItem = new CheckListItemRepository(_db);
 
         }
 

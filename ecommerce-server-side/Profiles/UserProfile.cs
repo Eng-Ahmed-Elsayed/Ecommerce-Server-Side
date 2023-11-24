@@ -18,6 +18,8 @@ namespace ecommerce_server_side.Profiles
             CreateMap<UserPayment, UserPaymentDto>().ReverseMap();
             CreateMap<CartItem, CartItemDto>().ReverseMap();
             CreateMap<ShoppingCart, ShoppingCartDto>().ReverseMap();
+            CreateMap<CheckList, CheckListDto>().ReverseMap();
+            CreateMap<CheckListItem, CheckListItemDto>().ReverseMap();
         }
     }
 }

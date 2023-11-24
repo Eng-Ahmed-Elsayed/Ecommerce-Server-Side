@@ -46,6 +46,10 @@ namespace DataAccess.Data
             .WithOne()
             .HasForeignKey(e => e.UserId);
 
+            modelBuilder.Entity<User>()
+            .HasOne<CheckList>()
+            .WithOne();
+
             // Product relations
             modelBuilder.Entity<Category>()
             .HasMany<Product>()
@@ -83,6 +87,12 @@ namespace DataAccess.Data
             .HasForeignKey(e => e.ProductId)
             .IsRequired();
 
+            modelBuilder.Entity<CheckListItem>()
+            .HasOne(e => e.Product)
+            .WithMany()
+            .HasForeignKey(e => e.ProductId)
+            .IsRequired();
+
             modelBuilder.Entity<Product>()
             .HasMany(e => e.Tags)
             .WithMany();
@@ -94,6 +104,7 @@ namespace DataAccess.Data
             modelBuilder.Entity<Product>()
             .HasMany(e => e.Colors)
             .WithMany();
+
 
 
             // OrderDetails with OrderItem
@@ -109,6 +120,13 @@ namespace DataAccess.Data
             .HasMany(e => e.CartItems)
             .WithOne()
             .HasForeignKey(e => e.ShoppingCartId)
+            .IsRequired();
+
+            // Favorties with CheckListItem
+            modelBuilder.Entity<CheckList>()
+            .HasMany(e => e.CheckListItems)
+            .WithOne()
+            .HasForeignKey(e => e.CheckListId)
             .IsRequired();
 
             // OrderDetails Relations
@@ -152,5 +170,8 @@ namespace DataAccess.Data
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Size> Sizes { get; set; }
+        public DbSet<CheckList> CheckLists { get; set; }
+        public DbSet<CheckListItem> CheckListItems { get; set; }
+
     }
 }

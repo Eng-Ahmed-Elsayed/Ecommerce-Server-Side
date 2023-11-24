@@ -54,6 +54,25 @@ namespace ecommerce_server_side.Controllers
                 {
                     productResult.Quantity = invntory.Quantity;
                 }
+                // If the user is logged in.
+                var userId = User.FindFirst("id")?.Value;
+                if (!userId.IsNullOrEmpty())
+                {
+                    var checkList = await _unitOfWork.CheckList.GetAsync(x =>
+                    x.UserId == userId && x.IsDeleted != true,
+                    "CheckListItems");
+                    // If the user has checkList.
+                    // else we do not need to do anything because his checkList is empty
+                    if (checkList != null)
+                    {
+                        // If this porudct in his checkListItems mark it.
+                        if (checkList.CheckListItems.Any(i => i.ProductId == productResult.Id
+                            && i.IsDeleted != true))
+                        {
+                            productResult.IsInCheckList = true;
+                        }
+                    }
+                }
                 return Ok(productResult);
             }
             catch (Exception ex)
@@ -63,25 +82,37 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProductList([FromQuery] string? name)
+        public async Task<IActionResult> ProductList()
         {
             try
             {
-                IEnumerable<Product> products;
-                if (name != null)
-                {
-                    products = await _unitOfWork.Product.GetListAsync(p =>
-                    p.Name.Contains(name) && p.IsDeleted != true
-                    , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
-
-                }
-                else
-                {
-                    products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
-                            , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
-                }
+                IEnumerable<Product> products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
+                        , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
                 var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
+                // If the user is logged in.
+                var userId = User.FindFirst("id")?.Value;
+                if (!userId.IsNullOrEmpty())
+                {
+                    var checkList = await _unitOfWork.CheckList.GetAsync(x =>
+                    x.UserId == userId && x.IsDeleted != true,
+                    "CheckListItems");
+                    // If the user has checkList.
+                    // else we do not need to do anything because his checkList is empty
+                    if (checkList != null)
+                    {
+                        productsResult = productsResult.Select(x =>
+                        {
+                            // If this porudct in his checkListItems mark it.
+                            if (checkList.CheckListItems.Any(i => i.ProductId == x.Id
+                                && i.IsDeleted != true))
+                            {
+                                x.IsInCheckList = true;
+                            }
+                            return x;
+                        });
+                    }
 
+                }
                 return Ok(productsResult);
             }
             catch (Exception ex)
