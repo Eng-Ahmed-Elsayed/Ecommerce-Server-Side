@@ -7,7 +7,9 @@ namespace Models.Models
     {
         public Guid Id { get; set; }
         [Required]
-        [StringLength(30, ErrorMessage = "Name length can't be more than 30.")]
+        [StringLength(40,
+            MinimumLength = 5,
+            ErrorMessage = "Name length must be between 5 and 40.")]
         public string Name { get; set; }
         [Required]
         [Range(0.01, 0.99)]

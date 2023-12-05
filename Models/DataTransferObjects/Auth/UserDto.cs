@@ -1,15 +1,29 @@
-﻿namespace Models.DataTransferObjects.Auth
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Models.DataTransferObjects.Auth
 {
     public class UserDto
     {
         public string? Id { get; set; }
+        [StringLength(20,
+            MinimumLength = 3,
+            ErrorMessage = "Username length must be between 3 and 40.")]
         public string? UserName { get; set; }
         public string? NormalizedUserName { get; set; }
+        [StringLength(40,
+            MinimumLength = 3,
+            ErrorMessage = "First name length must be between 3 and 40.")]
         public string? FirstName { get; set; }
+        [StringLength(40,
+            MinimumLength = 3,
+            ErrorMessage = "Last name length must be between 3 and 40.")]
         public string? LastName { get; set; }
+        [EmailAddress]
         public string? Email { get; set; }
+        [EmailAddress]
         public string? NormalizedEmail { get; set; }
         public bool? EmailConfirmed { get; set; }
+        [Phone]
         public string? PhoneNumber { get; set; }
         public string? PhoneNumberConfirmed { get; set; }
         public DateTime? Birthdate { get; set; }

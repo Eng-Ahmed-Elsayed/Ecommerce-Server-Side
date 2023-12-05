@@ -97,7 +97,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
         }
 
@@ -120,7 +120,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, "The server encountered an unexpected condition. Please try again later.");
             }
         }
 

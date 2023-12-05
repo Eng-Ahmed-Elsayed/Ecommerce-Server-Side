@@ -9,26 +9,40 @@ namespace Models.DataTransferObjects.Shared
         public string? UserId { get; set; }
         public UserDto? User { get; set; }
         [Required]
-        [StringLength(40, ErrorMessage = "First Name length can't be more than 40.")]
+        [StringLength(20,
+             MinimumLength = 2,
+             ErrorMessage = "First Name length must be between 2 and 20.")]
         public string FirstName { get; set; }
         [Required]
-        [StringLength(40, ErrorMessage = "Last Name length can't be more than 40.")]
+        [StringLength(20,
+             MinimumLength = 2,
+             ErrorMessage = "First Name length must be between 2 and 20.")]
         public string LastName { get; set; }
         [Required]
-        [StringLength(80, ErrorMessage = "AddressLine1 length can't be more than 80.")]
+        [StringLength(80,
+            MinimumLength = 2,
+            ErrorMessage = "AddressLine1 length must be between 2 and 80.")]
         public string AddressLine1 { get; set; }
 
-        [StringLength(80, ErrorMessage = "AddressLine1 length can't be more than 80.")]
+        [StringLength(80,
+            MinimumLength = 2,
+            ErrorMessage = "AddressLine2 length must be between 2 and 80.")]
         public string? AddressLine2 { get; set; }
 
         [Required]
-        [StringLength(40, ErrorMessage = "City length can't be more than 40.")]
+        [StringLength(40,
+            MinimumLength = 2,
+            ErrorMessage = "City length must be between 2 and 40.")]
         public string City { get; set; }
         [Required]
-        [StringLength(40, ErrorMessage = "State length can't be more than 40.")]
+        [StringLength(40,
+            MinimumLength = 2,
+            ErrorMessage = "State length must be between 2 and 40.")]
         public string State { get; set; }
         [Required]
-        [StringLength(40, ErrorMessage = "Country length can't be more than 40.")]
+        [StringLength(40,
+            MinimumLength = 2,
+            ErrorMessage = "Country length must be between 2 and 40.")]
         public string Country { get; set; }
         [Required]
         [MinLength(4)]

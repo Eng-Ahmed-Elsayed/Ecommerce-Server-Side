@@ -7,10 +7,14 @@ namespace Models.Models
     {
         public Guid Id { get; set; }
         [Required]
-        [StringLength(80, ErrorMessage = "Name length can't be more than 80.")]
+        [StringLength(40,
+            MinimumLength = 5,
+            ErrorMessage = "Name length must be between 5 and 40.")]
         public string Name { get; set; }
         [Required]
-        [MinLength(20, ErrorMessage = "Description length can't be less than 20.")]
+        [StringLength(100,
+            MinimumLength = 2,
+            ErrorMessage = "Description length must be between 2 and 100.")]
 
         public string Description { get; set; }
         [MinLength(4)]
@@ -38,7 +42,8 @@ namespace Models.Models
         public List<Size> Sizes { get; set; } = new();
         [MaxLength(20)]
         public List<Color> Colors { get; set; } = new();
-        public List<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+        [MaxLength(6)]
+        public List<ProductImage> ProductImages { get; set; } = new();
 
 
         public Guid? CategoryId { get; set; }

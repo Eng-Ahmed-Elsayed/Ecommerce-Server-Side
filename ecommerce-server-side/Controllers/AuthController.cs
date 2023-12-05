@@ -78,11 +78,11 @@ namespace ecommerce_server_side.Controllers
                 await SendEmailConfirmationEmail(user, userForRegistrationDto.ClientURI);
 
                 await _userManager.AddToRoleAsync(user, "Viewer");
-                return StatusCode(201);
+                return StatusCode(201, new RegistrationResponseDto { IsSuccessfulRegistration = true });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
 
         }
@@ -101,7 +101,7 @@ namespace ecommerce_server_side.Controllers
                 var user = await _userManager.FindByNameAsync(userForAuthentication.UserName);
                 if (user == null)
                 {
-                    return BadRequest("Invalid username or password");
+                    return BadRequest("Invalid username or password.");
                 }
 
                 // Check if the account is locked out
@@ -111,14 +111,14 @@ namespace ecommerce_server_side.Controllers
                     var message = new Message(new string[] { user.Email },
                         "Locked out account information", content);
                     await _emailSender.SendEmailAsync(message);
-                    return Unauthorized(new AuthResponseDto { ErrorMessage = "The account is locked out" });
+                    return Unauthorized(new AuthResponseDto { ErrorMessage = "Your account is locked out, please reset your password." });
                 }
 
                 // Check the password
                 if (!await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 {
                     await _userManager.AccessFailedAsync(user);
-                    return Unauthorized(new AuthResponseDto { ErrorMessage = "Invalid username or password" });
+                    return Unauthorized(new AuthResponseDto { ErrorMessage = "Invalid username or password." });
                 }
 
                 // Check if the email is confirmed
@@ -126,7 +126,7 @@ namespace ecommerce_server_side.Controllers
                 {
                     return Unauthorized(new AuthResponseDto
                     {
-                        ErrorMessage = "Email is not confirmed"
+                        ErrorMessage = "Email is not confirmed."
                     });
                 }
 
@@ -145,7 +145,7 @@ namespace ecommerce_server_side.Controllers
 
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
         }
 
@@ -211,7 +211,7 @@ namespace ecommerce_server_side.Controllers
             {
                 return BadRequest("Invalid Request");
             }
-
+            // If last email was sent before one or more mins.
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var param = new Dictionary<string, string?>
             {
@@ -271,6 +271,7 @@ namespace ecommerce_server_side.Controllers
                 return BadRequest("Your email is already confirmed");
             }
 
+            // If last email was sent before one or more mins.
             var confirmResult = await _userManager.ConfirmEmailAsync(user, emailConfirmationDto.Token);
             if (!confirmResult.Succeeded)
             {
@@ -368,7 +369,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
         }
 
@@ -412,7 +413,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
         }
 
@@ -458,7 +459,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
         }
 
@@ -487,7 +488,7 @@ namespace ecommerce_server_side.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
         }
 

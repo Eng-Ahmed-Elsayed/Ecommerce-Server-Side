@@ -7,15 +7,27 @@ namespace Models.DataTransferObjects.Shared
     public class ProductDto
     {
         public Guid? Id { get; set; }
-        [StringLength(80, ErrorMessage = "Name length can't be more than 80.")]
+        [Required]
+        [StringLength(40,
+            MinimumLength = 5,
+            ErrorMessage = "Name length must be between 5 and 40.")]
+
         public string? Name { get; set; }
+        [Required]
+        [StringLength(100,
+            MinimumLength = 2,
+            ErrorMessage = "Description length must be between 2 and 100.")]
+
         public string? Description { get; set; }
+        [Required]
         [MinLength(4)]
         [MaxLength(30)]
         public string? ProductCode { get; set; }
+        [Required]
         [MinLength(4)]
         [MaxLength(16)]
         public string? ProductSKU { get; set; }
+        [Required]
         [Range(0.01, 999999.99)]
         [Precision(18, 2)]
         public decimal Price { get; set; }
@@ -23,7 +35,9 @@ namespace Models.DataTransferObjects.Shared
         [Range(0, 5)]
         public decimal? Rating { get; set; }
         // Publish or draft 
+        [Required]
         public string? Status { get; set; }
+        [Required]
         public bool InStock { get; set; }
         [MaxLength(20)]
         public List<Tag>? Tags { get; set; }
