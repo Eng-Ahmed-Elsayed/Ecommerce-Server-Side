@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Models.DataTransferObjects.Customer;
 using Models.Models;
 
@@ -8,6 +10,7 @@ namespace ecommerce_server_side.Controllers
 {
     [Route("api/users/orders")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -33,7 +36,7 @@ namespace ecommerce_server_side.Controllers
                     var shoppingCart = await _unitOfWork.ShoppingCart.GetAsync(x =>
                                         x.UserId == userId
                                         && x.IsDeleted != true,
-                                        "CartItems.Product.Inventory");
+                                        "CartItems.Product.Inventory,CartItems.Product.Discounts");
                     var userAddress = await _unitOfWork.UserAddress.GetAsync(e =>
                                         e.Id == orderDetailsDto.UserAddressId
                                         && e.UserId == userId
@@ -75,6 +78,19 @@ namespace ecommerce_server_side.Controllers
                             OrderItem orderItem = _mapper.Map<OrderItem>(cartItem);
                             orderItem.OrderDetailsId = orderDetailsId;
                             orderItem.CreatedAt = DateTime.Now;
+                            // If there is a discount code check 
+                            if (!orderDetailsDto.DiscountCode.IsNullOrEmpty())
+                            {
+                                // If it is available for this item apply it.
+                                var dis = orderItem.Product.Discounts.Find(d =>
+                                    d.Code == orderDetailsDto.DiscountCode);
+                                if (dis != null && dis.IsActive)
+                                {
+                                    orderItem.DiscountCode = dis.Code;
+                                    orderItem.DiscountPercent = dis.DiscountPercent;
+                                }
+
+                            }
                             await _unitOfWork.OrderItem.AddAsync(orderItem);
                         });
                         OrderDetails orderDetails = _mapper.Map<OrderDetails>(orderDetailsDto);

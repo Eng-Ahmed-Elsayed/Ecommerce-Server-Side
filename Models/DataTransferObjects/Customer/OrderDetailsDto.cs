@@ -21,6 +21,10 @@ namespace Models.DataTransferObjects.Customer
         [Required]
         public Guid UserPaymentId { get; set; }
         public UserPaymentDto? UserPayment { get; set; }
+        [StringLength(6,
+            MinimumLength = 6,
+            ErrorMessage = "Discount code length must be 6.")]
+        public string? DiscountCode { get; set; }
         public DateTime? CreatedAt { get; set; }
 
     }

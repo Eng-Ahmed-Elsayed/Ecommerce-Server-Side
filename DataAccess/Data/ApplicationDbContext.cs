@@ -65,9 +65,8 @@ namespace DataAccess.Data
 
             modelBuilder.Entity<Discount>()
             .HasMany(e => e.Products)
-            .WithOne()
-            .HasForeignKey(e => e.DiscoutId)
-            .IsRequired(false);
+            .WithMany(e => e.Discounts);
+
 
             modelBuilder.Entity<Product>()
            .HasMany(e => e.ProductImages)

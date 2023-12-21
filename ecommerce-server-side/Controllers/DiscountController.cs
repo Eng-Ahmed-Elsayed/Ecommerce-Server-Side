@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,32 @@ namespace ecommerce_server_side.Controllers
 
         }
 
+        // Generate random discount code
+        private async Task<string> GenerateDiscountCode()
+        {
+            // Define the characters that can be used in the code
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            // Create a random number generator
+            Random random = new Random();
+            // Create a string builder to store the code
+            StringBuilder code = new StringBuilder();
+            // Generate 10 random characters and append them to the code
+            for (int i = 0; i < 6; i++)
+            {
+                code.Append(chars[random.Next(chars.Length)]);
+            }
+            // New code
+            var newCode = code.ToString();
+            // Check if not unique call again
+            if ((await _unitOfWork.Discount.GetAsync(d => d.Code == newCode) != null))
+            {
+                newCode = await GenerateDiscountCode();
+            }
+            // Return the code as a string
+            return newCode;
+
+        }
+
         // <-------Discount Actions------->
         [HttpGet]
         public async Task<IActionResult> DiscountList()
@@ -40,6 +67,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetDiscount([FromRoute] Guid id)
         {
             try
@@ -52,9 +80,9 @@ namespace ecommerce_server_side.Controllers
                 }
                 var discountResult = _mapper.Map<DiscountDto>(discount);
 
-                var otherProducts = await _unitOfWork.Product
-                    .GetListAsync(p =>
-                    (p.DiscoutId != discount.Id && p.IsDeleted != true), "ProductImages");
+                var otherProducts = await _unitOfWork.Product.GetListAsync(p =>
+                    !p.Discounts.Any(d => d.Id == discount.Id)
+                    && p.IsDeleted != true, "ProductImages");
                 discountResult.OtherProducts = _mapper.Map<List<ProductDto>>(otherProducts);
                 return Ok(discountResult);
             }
@@ -64,7 +92,32 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
+        // Get discount by code for users
+        [HttpGet]
+        [Route("codes")]
+        public async Task<IActionResult> GetDiscountByCode([FromQuery] string code)
+        {
+            try
+            {
+                var discount = await _unitOfWork.Discount.GetAsync(c =>
+                (c.Code == code && c.IsDeleted != true && c.IsActive), "Products");
+                if (discount == null)
+                {
+                    return NotFound();
+                }
+                var discountResult = _mapper.Map<DiscountDto>(discount);
+                return Ok(discountResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
+            }
+        }
+
+
+
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddDiscount([FromBody] DiscountDto? discountDto)
         {
             try
@@ -76,6 +129,8 @@ namespace ecommerce_server_side.Controllers
                 discountDto.Id = Guid.NewGuid();
                 Discount discount = _mapper.Map<Discount>(discountDto);
                 discount.CreatedAt = DateTime.Now;
+                discount.Code = await GenerateDiscountCode();
+
                 bool result = await _unitOfWork.Discount.AddAsync(discount);
                 if (result)
                 {
@@ -94,6 +149,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> UpdateDiscount([FromBody] DiscountDto discountDto)
         {
             try
@@ -103,7 +159,7 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invalid Model!");
                 }
 
-                var discount = await _unitOfWork.Discount.GetAsync(c => c.Id == discountDto.Id);
+                var discount = await _unitOfWork.Discount.GetAsync(c => c.Id == discountDto.Id, "Products");
                 if (discount == null)
                 {
                     return NotFound();
@@ -113,13 +169,14 @@ namespace ecommerce_server_side.Controllers
 
                 if (discount.Products != newDiscountProducts && newDiscountProducts != null)
                 {
-                    foreach (var productDto in newDiscountProducts)
+                    // First remove all products.
+                    discount.Products.RemoveAll(p => true);
+                    // Update it with newDiscountProducts.
+                    // We use this way because dicount.Products cann't be set.
+                    foreach (var newProduct in newDiscountProducts)
                     {
-                        var product = await _unitOfWork.Product.GetAsync(p => p.Id == productDto.Id);
-                        product.DiscoutId = discountDto.Id;
-
-                        // We will save one time after the discount
-                        //await _unitOfWork.SaveAsync();
+                        var product = await _unitOfWork.Product.GetAsync(x => x.Id == newProduct.Id && x.IsDeleted != true);
+                        discount.Products.Add(product);
                     }
                 }
 
@@ -127,7 +184,6 @@ namespace ecommerce_server_side.Controllers
                 discount.Name = discountDto.Name;
                 discount.DiscountPercent = discountDto.DiscountPercent;
                 discount.IsActive = discountDto.IsActive;
-                //discount.Products = discountDto.Products;
                 discount.UpdatedAt = DateTime.Now;
 
                 await _unitOfWork.SaveAsync();
@@ -143,6 +199,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteDiscount([FromRoute] Guid id)
         {
             try
@@ -166,6 +223,7 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteDiscountRange([FromBody] DiscountDto[] discountDtos)
         {
             try

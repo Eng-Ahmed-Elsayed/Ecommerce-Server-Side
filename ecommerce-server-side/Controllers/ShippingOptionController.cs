@@ -60,6 +60,7 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddShippingOption([FromBody] ShippingOptionDto? shippingOptionDto)
         {
             try
@@ -87,6 +88,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> UpdateShippingOption([FromBody] ShippingOptionDto shippingOptionDto)
         {
             try
@@ -119,6 +121,7 @@ namespace ecommerce_server_side.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteShippingOption([FromRoute] Guid id)
         {
             try
@@ -142,6 +145,7 @@ namespace ecommerce_server_side.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteShippingOptionRange([FromBody] ShippingOptionDto[] shippingOptionDtos)
         {
             try

@@ -25,6 +25,11 @@ namespace Models.Models
             }
         }
 
+        [StringLength(6,
+            MinimumLength = 6,
+            ErrorMessage = "Discount code length must be 6.")]
+        public string? DiscountCode { get; set; }
+
         public Guid ShippingOptionId { get; set; }
         public ShippingOption? ShippingOption { get; }
         public Guid UserAddressId { get; set; }
@@ -34,8 +39,14 @@ namespace Models.Models
 
 
         [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
         public DateTime? CreatedAt { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
         public DateTime? UpdatedAt { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
         public DateTime? DeletedAt { get; set; }
         public bool? IsDeleted { get; set; }
     }

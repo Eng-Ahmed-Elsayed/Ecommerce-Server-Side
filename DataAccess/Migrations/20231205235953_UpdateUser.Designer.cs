@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205235953_UpdateUser")]
+    partial class UpdateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,21 +38,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ColorProduct");
-                });
-
-            modelBuilder.Entity("DiscountProduct", b =>
-                {
-                    b.Property<Guid>("DiscountsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("DiscountsId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("DiscountProduct");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -360,11 +348,6 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .IsRequired()
                         .HasColumnType("datetime2");
@@ -434,10 +417,6 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DiscountCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -482,14 +461,6 @@ namespace DataAccess.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("DiscountCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<decimal?>("DiscountPercent")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -536,6 +507,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid?>("DiscoutId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("InStock")
                         .HasColumnType("bit");
 
@@ -577,6 +551,8 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("DiscoutId");
 
                     b.HasIndex("InventoryId");
 
@@ -996,21 +972,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DiscountProduct", b =>
-                {
-                    b.HasOne("Models.Models.Discount", null)
-                        .WithMany()
-                        .HasForeignKey("DiscountsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Models.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1159,6 +1120,10 @@ namespace DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("CategoryId");
 
+                    b.HasOne("Models.Models.Discount", null)
+                        .WithMany("Products")
+                        .HasForeignKey("DiscoutId");
+
                     b.HasOne("Models.Models.Inventory", "Inventory")
                         .WithMany("Products")
                         .HasForeignKey("InventoryId");
@@ -1233,6 +1198,11 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Models.Models.CheckList", b =>
                 {
                     b.Navigation("CheckListItems");
+                });
+
+            modelBuilder.Entity("Models.Models.Discount", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Models.Models.Inventory", b =>

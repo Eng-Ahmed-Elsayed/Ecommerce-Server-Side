@@ -20,6 +20,7 @@ namespace ecommerce_server_side.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
 
+
         }
 
         [HttpGet]
@@ -32,7 +33,7 @@ namespace ecommerce_server_side.Controllers
                     var userId = User.FindFirst("id")?.Value;
                     var shoppingCart = await _unitOfWork.ShoppingCart.GetAsync(x =>
                     x.UserId == userId && x.IsDeleted != true
-                    , "CartItems.Product.ProductImages,CartItems.Product.Inventory");
+                    , "CartItems.Product.ProductImages,CartItems.Product.Inventory,CartItems.Product.Discounts");
 
                     // If the user does not have shopping cart create one.
                     if (shoppingCart == null)

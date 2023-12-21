@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using DataAccess.Data;
 using DataAccess.Repository;
 using DataAccess.Repository.IRepository;
@@ -19,7 +20,11 @@ using Utility.ManageFiles;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    //Preserve references and handle circular references
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration.GetConnectionString("EcommerceDatabase")));
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
@@ -45,6 +50,7 @@ builder.Services.AddScoped<IManageFiles, ManageFiles>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(UserProfile));

@@ -26,7 +26,7 @@ namespace DataAccess.Repository
                 // Name filter
                 if (productParameters.Name != null)
                 {
-                    query = query.Where(x => x.Name == productParameters.Name);
+                    query = query.Where(x => x.Name.Contains(productParameters.Name));
                 }
                 // Colors filter
                 // Get all products if have at least one color from the colrs names list
@@ -88,8 +88,8 @@ namespace DataAccess.Repository
                     query = query.Where(x => x.Category.Name == productParameters.Category
                                 && x.Category.IsDeleted != true);
                 }
-                // Not deleted filter
-                query = query.Where(x => x.IsDeleted != true);
+                // Not deleted filter and status is publish
+                query = query.Where(x => x.IsDeleted != true && x.Status == "publish");
                 // Sorting
                 query = _sortHelper.ApplySort(query, productParameters.OrderBy);
             }

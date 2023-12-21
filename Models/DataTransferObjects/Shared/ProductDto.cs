@@ -50,18 +50,13 @@ namespace Models.DataTransferObjects.Shared
         public Guid? CategoryId { get; set; }
         public CategoryDto? Category { get; set; }
         public Guid? InventoryId { get; set; }
+        public InventoryDto? Inventory { get; set; }
+        public List<DiscountDto>? Discounts { get; set; }
 
-        public Guid? DiscoutId { get; set; }
-        public DiscountDto? Discount { get; set; }
 
         // Used to add or update inventory quantity to a product.
         public int Quantity { get; set; }
 
-        // Used in get or get list actions.
-        // If we did this from the model it will give us an error in the client
-        // because the product will inculde the inventory then will inculde the product
-        // and so on.
-        public InventoryDto? Inventory { get; set; }
 
         // We will use this property to know if this product is in the user CheckList or not.
         public bool? IsInCheckList { get; set; }

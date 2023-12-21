@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,29 +36,36 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var product = await _unitOfWork.Product.GetAsync(p =>
-                (p.Id == id && p.IsDeleted != true), "ProductImages,Tags,Colors,Sizes");
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+                Product? product;
+                //if admin
+                if (userRole == "Administrator")
+                {
+                    product = await _unitOfWork.Product.GetAsync(p =>
+                            p.Id == id
+                            && p.IsDeleted != true
+                            , "ProductImages,Tags,Colors,Sizes,Inventory");
+                }
+                // else status is publish
+                else
+                {
+                    product = await _unitOfWork.Product.GetAsync(p =>
+                            p.Id == id
+                            && p.IsDeleted != true
+                            && p.Status == "publish"
+                            , "ProductImages,Tags,Colors,Sizes,Inventory");
+                }
+
                 if (product == null)
                 {
                     return NotFound();
                 }
                 var productResult = _mapper.Map<ProductDto>(product);
-                // Get discount
-                if (productResult.DiscoutId != null)
-                {
-                    productResult.Discount = await _unitOfWork.Discount.GetAsync(x => x.Id == productResult.DiscoutId);
-                }
-                // Get quantity
-                var invntory = await _unitOfWork.Inventory.GetAsync(x => x.Id == productResult.InventoryId);
 
-                if (invntory != null)
-                {
-                    productResult.Quantity = invntory.Quantity;
-                }
                 // If the user is logged in.
-                var userId = User.FindFirst("id")?.Value;
-                if (!userId.IsNullOrEmpty())
+                if (!userRole.IsNullOrEmpty())
                 {
+                    var userId = User.FindFirst("id")?.Value;
                     var checkList = await _unitOfWork.CheckList.GetAsync(x =>
                     x.UserId == userId && x.IsDeleted != true,
                     "CheckListItems");
@@ -86,13 +94,28 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                IEnumerable<Product> products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
-                        , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+                IEnumerable<Product> products;
+                //if admin
+                if (userRole == "Administrator")
+                {
+                    products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
+                       , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                }
+                // else status is publish
+                else
+                {
+                    products = await _unitOfWork.Product.GetListAsync(p =>
+                                p.IsDeleted != true
+                                && p.Status == "publish"
+                                    , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                }
+
                 var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
                 // If the user is logged in.
-                var userId = User.FindFirst("id")?.Value;
-                if (!userId.IsNullOrEmpty())
+                if (!userRole.IsNullOrEmpty())
                 {
+                    var userId = User.FindFirst("id")?.Value;
                     var checkList = await _unitOfWork.CheckList.GetAsync(x =>
                     x.UserId == userId && x.IsDeleted != true,
                     "CheckListItems");
@@ -355,7 +378,6 @@ namespace ecommerce_server_side.Controllers
                 product.Status = productDto.Status;
                 product.InStock = productDto.InStock;
                 product.CategoryId = productDto.CategoryId;
-                product.DiscoutId = productDto.DiscoutId;
                 product.UpdatedAt = DateTime.Now;
                 // Update quantity in the inventory
                 Inventory inventory = await _unitOfWork.Inventory.GetAsync(i => i.Id == product.InventoryId);
@@ -393,7 +415,7 @@ namespace ecommerce_server_side.Controllers
                     await DeleteImage(productImg.ImgPath);
                 }
                 // Delete the product
-                product.DiscoutId = null;
+                product.Discounts.RemoveAll(x => true);
                 product.IsDeleted = true;
                 product.DeletedAt = DateTime.Now;
                 //await _unitOfWork.Product.DeleteAsync(product);

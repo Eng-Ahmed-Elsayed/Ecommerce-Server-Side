@@ -12,12 +12,17 @@ namespace Models.Models
             ErrorMessage = "Name length must be between 5 and 40.")]
         public string Name { get; set; }
         [Required]
+        [StringLength(6,
+            MinimumLength = 6,
+            ErrorMessage = "Code length must be 6.")]
+        public string Code { get; set; }
+        [Required]
         [Range(0.01, 0.99)]
         [Precision(3, 2)]
         public decimal DiscountPercent { get; set; }
         [Required]
         public bool IsActive { get; set; }
-        public List<Product> Products { get; } = new List<Product>();
+        public List<Product> Products { get; } = new();
 
         [Required]
         public DateTime? CreatedAt { get; set; }

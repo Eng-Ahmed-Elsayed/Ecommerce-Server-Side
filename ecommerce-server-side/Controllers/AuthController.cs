@@ -37,9 +37,26 @@ namespace ecommerce_server_side.Controllers
             _manageFiles = manageFiles;
         }
 
-        // Method to send confirmation email
-        private async Task SendEmailConfirmationEmail(User user, string ClientURI)
+        // Function to check if the last email message before 1 minute.
+        private async Task<bool> TimeMoreThanOneMinute(User user)
         {
+            TimeSpan interval = DateTime.Now - user.LastEmailDate;
+            if (interval.TotalMinutes < 1)
+            {
+                return false;
+            }
+            user.LastEmailDate = DateTime.Now;
+            await _userManager.UpdateAsync(user);
+            return true;
+        }
+
+        // Method to send confirmation email
+        private async Task<bool> SendEmailConfirmationEmail(User user, string ClientURI)
+        {
+            if (!await TimeMoreThanOneMinute(user))
+            {
+                return false;
+            }
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var param = new Dictionary<string, string?>
             {
@@ -50,8 +67,11 @@ namespace ecommerce_server_side.Controllers
 
             var message = new Message(new string[] { user.Email }, "Email Confirmation token", callback);
             await _emailSender.SendEmailAsync(message);
+            user.LastEmailDate = DateTime.Now;
+            return true;
         }
 
+        // Regsiter user
         [HttpPost("registration")]
         public async Task<IActionResult> RegisterUser(
             [FromBody] UserForRegistrationDto userForRegistrationDto)
@@ -107,10 +127,15 @@ namespace ecommerce_server_side.Controllers
                 // Check if the account is locked out
                 if (await _userManager.IsLockedOutAsync(user))
                 {
-                    var content = $"Your account is locked out. To reset the password click this link: {userForAuthentication.ClientURI}";
-                    var message = new Message(new string[] { user.Email },
-                        "Locked out account information", content);
-                    await _emailSender.SendEmailAsync(message);
+
+                    var timeResult = await TimeMoreThanOneMinute(user);
+                    if (timeResult)
+                    {
+                        var content = $"Your account is locked out. To reset the password click this link: {userForAuthentication.ClientURI}";
+                        var message = new Message(new string[] { user.Email },
+                            "Locked out account information", content);
+                        await _emailSender.SendEmailAsync(message);
+                    }
                     return Unauthorized(new AuthResponseDto { ErrorMessage = "Your account is locked out, please reset your password." });
                 }
 
@@ -161,15 +186,22 @@ namespace ecommerce_server_side.Controllers
                     IsAuthSuccessful = false
                 });
             }
-            var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
-            var message = new Message(new string[] { user.Email }, "Authentication token", token);
-            await _emailSender.SendEmailAsync(message);
 
-            return Ok(new AuthResponseDto
+            var timeResult = await TimeMoreThanOneMinute(user);
+            if (timeResult)
             {
-                Is2StepVerificationRequired = true,
-                Provider = "Email",
-            });
+                var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
+                var message = new Message(new string[] { user.Email }, "Authentication token", token);
+                await _emailSender.SendEmailAsync(message);
+
+                return Ok(new AuthResponseDto
+                {
+                    Is2StepVerificationRequired = true,
+                    Provider = "Email",
+                });
+            }
+            return BadRequest("Please wait 1 minute to send new email.");
+
         }
 
         // TwoStepVerification Login Action
@@ -203,7 +235,7 @@ namespace ecommerce_server_side.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest("Invaild model.");
             }
 
             var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
@@ -211,19 +243,25 @@ namespace ecommerce_server_side.Controllers
             {
                 return BadRequest("Invalid Request");
             }
-            // If last email was sent before one or more mins.
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var param = new Dictionary<string, string?>
+
+            // If last email was sent before one or more minutes.
+            var timeResult = await TimeMoreThanOneMinute(user);
+            if (timeResult)
             {
-                {"token", token},
-                {"email", forgotPasswordDto.Email}
-            };
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var param = new Dictionary<string, string?>
+                            {
+                                {"token", token},
+                                {"email", forgotPasswordDto.Email}
+                            };
 
-            var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param);
-            var message = new Message(new string[] { user.Email }, "Reset password token", callback);
-            await _emailSender.SendEmailAsync(message);
+                var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param);
+                var message = new Message(new string[] { user.Email }, "Reset password token", callback);
+                await _emailSender.SendEmailAsync(message);
+                return Ok();
+            }
+            return BadRequest("Please wait 1 minute to send new email.");
 
-            return Ok();
         }
 
         [HttpPost("reset-password")]
@@ -231,7 +269,7 @@ namespace ecommerce_server_side.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest("Invaild model.");
             }
             var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
 
@@ -258,7 +296,7 @@ namespace ecommerce_server_side.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest("Invaild model.");
             }
             var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
             if (user == null)
@@ -284,6 +322,10 @@ namespace ecommerce_server_side.Controllers
         [HttpPost("send-email-confirmation")]
         public async Task<IActionResult> SendEmailConfirmation([FromBody] SendEmailConfirmationDto sendEmailConfirmationDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invaild model.");
+            }
             var user = await _userManager.FindByEmailAsync(sendEmailConfirmationDto.Email);
             if (user == null)
             {
@@ -293,13 +335,21 @@ namespace ecommerce_server_side.Controllers
             {
                 return BadRequest("Your email is already confirmed");
             }
-            await SendEmailConfirmationEmail(user, sendEmailConfirmationDto.ClientURI);
-            return Ok();
+            var result = await SendEmailConfirmationEmail(user, sendEmailConfirmationDto.ClientURI);
+            if (result)
+            {
+                return Ok();
+            }
+            return BadRequest("Please wait 1 minute to send new email.");
         }
 
         [HttpPost("external-login")]
         public async Task<IActionResult> ExternalLogin([FromBody] ExternalAuthDto externalAuth)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invaild model.");
+            }
             var payload = await _jwtHandler.VerifyGoogleToken(externalAuth);
             if (payload == null)
                 return BadRequest("Invalid External Authentication.");

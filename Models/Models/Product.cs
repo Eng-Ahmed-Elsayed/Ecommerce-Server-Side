@@ -44,13 +44,13 @@ namespace Models.Models
         public List<Color> Colors { get; set; } = new();
         [MaxLength(6)]
         public List<ProductImage> ProductImages { get; set; } = new();
+        public List<Discount> Discounts { get; } = new();
 
 
         public Guid? CategoryId { get; set; }
         public Category? Category { get; }
         public Guid? InventoryId { get; set; }
         public Inventory? Inventory { get; }
-        public Guid? DiscoutId { get; set; }
         [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
