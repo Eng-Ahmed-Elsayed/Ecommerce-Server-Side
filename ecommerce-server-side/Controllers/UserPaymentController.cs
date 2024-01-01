@@ -108,7 +108,7 @@ namespace ecommerce_server_side.Controllers
 
                 var userId = User.FindFirst("id")?.Value;
                 var userPayment = await _unitOfWork.UserPayment.GetAsync(e =>
-                e.Id == userPaymentDto.Id && e.UserId == userId);
+                e.Id == userPaymentDto.Id && e.UserId == userId && e.IsDeleted != true);
                 if (userPayment == null)
                 {
                     return NotFound("User payment does not exist");

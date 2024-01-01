@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231225070646_UpdateReviewTable")]
+    partial class UpdateReviewTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ColorProduct", (string)null);
+                    b.ToTable("ColorProduct");
                 });
 
             modelBuilder.Entity("DiscountProduct", b =>
@@ -49,7 +52,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductsId");
 
-                    b.ToTable("DiscountProduct", (string)null);
+                    b.ToTable("DiscountProduct");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -233,7 +236,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ShoppingCartId");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("Models.Models.Category", b =>
@@ -270,7 +273,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Models.Models.CheckList", b =>
@@ -301,7 +304,7 @@ namespace DataAccess.Migrations
                         .IsUnique()
                         .HasFilter("[UserId] IS NOT NULL");
 
-                    b.ToTable("CheckLists", (string)null);
+                    b.ToTable("CheckLists");
                 });
 
             modelBuilder.Entity("Models.Models.CheckListItem", b =>
@@ -335,7 +338,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CheckListItems", (string)null);
+                    b.ToTable("CheckListItems");
                 });
 
             modelBuilder.Entity("Models.Models.Color", b =>
@@ -351,7 +354,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Colors", (string)null);
+                    b.ToTable("Colors");
                 });
 
             modelBuilder.Entity("Models.Models.Discount", b =>
@@ -392,7 +395,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Discounts", (string)null);
+                    b.ToTable("Discounts");
                 });
 
             modelBuilder.Entity("Models.Models.Inventory", b =>
@@ -418,7 +421,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Inventories", (string)null);
+                    b.ToTable("Inventories");
                 });
 
             modelBuilder.Entity("Models.Models.OrderDetails", b =>
@@ -467,7 +470,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserPaymentId");
 
-                    b.ToTable("OrdersDetails", (string)null);
+                    b.ToTable("OrdersDetails");
                 });
 
             modelBuilder.Entity("Models.Models.OrderItem", b =>
@@ -512,7 +515,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("Models.Models.Product", b =>
@@ -580,7 +583,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Models.Models.ProductImage", b =>
@@ -600,7 +603,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages", (string)null);
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("Models.Models.Review", b =>
@@ -648,7 +651,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Models.Models.ShippingOption", b =>
@@ -684,7 +687,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShippingOptions", (string)null);
+                    b.ToTable("ShippingOptions");
 
                     b.HasData(
                         new
@@ -739,7 +742,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ShoppingCarts", (string)null);
+                    b.ToTable("ShoppingCarts");
                 });
 
             modelBuilder.Entity("Models.Models.Size", b =>
@@ -755,7 +758,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sizes", (string)null);
+                    b.ToTable("Sizes");
                 });
 
             modelBuilder.Entity("Models.Models.Tag", b =>
@@ -771,7 +774,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Models.Models.User", b =>
@@ -943,7 +946,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAddresses", (string)null);
+                    b.ToTable("UserAddresses");
                 });
 
             modelBuilder.Entity("Models.Models.UserPayment", b =>
@@ -996,7 +999,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserPayments", (string)null);
+                    b.ToTable("UserPayments");
                 });
 
             modelBuilder.Entity("ProductSize", b =>
@@ -1011,7 +1014,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("SizesId");
 
-                    b.ToTable("ProductSize", (string)null);
+                    b.ToTable("ProductSize");
                 });
 
             modelBuilder.Entity("ProductTag", b =>
@@ -1026,7 +1029,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("ProductTag", (string)null);
+                    b.ToTable("ProductTag");
                 });
 
             modelBuilder.Entity("ColorProduct", b =>

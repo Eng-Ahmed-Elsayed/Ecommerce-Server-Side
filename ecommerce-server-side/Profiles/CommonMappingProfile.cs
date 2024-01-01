@@ -33,6 +33,7 @@ namespace Models.DataTransferObjects
                .ReverseMap()
                ;
 
+            CreateMap<Review, ReviewDto>().ReverseMap();
 
 
         }

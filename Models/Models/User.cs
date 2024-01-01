@@ -19,6 +19,8 @@ namespace Models.Models
         public ICollection<UserPayment> UserPayments { get; } = new List<UserPayment>();
         // This attribute to make sure our server do not send more than 1 email per minute.
         public DateTime LastEmailDate { get; set; }
+        // Reviews list for all reviews belong to the user
+        public List<Review> Reviews { get; } = new();
 
         [Required]
         public DateTime? CreatedAt { get; set; }

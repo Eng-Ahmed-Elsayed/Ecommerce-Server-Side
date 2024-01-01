@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Models.Models;
 
 namespace Models.DataTransferObjects.Auth
 {
@@ -32,6 +33,7 @@ namespace Models.DataTransferObjects.Auth
         public bool? LockoutEnabled { get; set; }
         public int? AccessFailedCount { get; set; }
 
+        public List<Review>? Reviews { get; set; }
 
 
 

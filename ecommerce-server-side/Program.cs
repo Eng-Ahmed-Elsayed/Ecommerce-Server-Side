@@ -24,6 +24,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     //Preserve references and handle circular references
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.WriteIndented = true;
+
 });
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration.GetConnectionString("EcommerceDatabase")));

@@ -27,6 +27,7 @@ namespace DataAccess.Repository
         public IProductImageRepository ProductImage { get; private set; }
         public ICheckListRepository CheckList { get; private set; }
         public ICheckListItemRepository CheckListItem { get; private set; }
+        public IReviewRepository Review { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, ISortHelper<Product> productSortHelper)
         {
@@ -50,6 +51,7 @@ namespace DataAccess.Repository
             ProductImage = new ProductImageRepository(_db);
             CheckList = new CheckListRepository(_db);
             CheckListItem = new CheckListItemRepository(_db);
+            Review = new ReviewRepository(_db);
 
         }
 

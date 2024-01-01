@@ -128,7 +128,8 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invalid Model!");
                 }
 
-                var category = await _unitOfWork.Category.GetAsync(c => c.Id == categoryDto.Id);
+                var category = await _unitOfWork.Category.GetAsync(c => c.Id == categoryDto.Id
+                                && c.IsDeleted != true);
                 if (category == null)
                 {
                     return NotFound();

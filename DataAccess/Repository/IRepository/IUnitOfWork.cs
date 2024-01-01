@@ -19,6 +19,7 @@
         IProductImageRepository ProductImage { get; }
         ICheckListRepository CheckList { get; }
         ICheckListItemRepository CheckListItem { get; }
+        IReviewRepository Review { get; }
 
         Task SaveAsync();
     }

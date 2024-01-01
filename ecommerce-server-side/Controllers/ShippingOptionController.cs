@@ -98,7 +98,8 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invalid Model!");
                 }
 
-                var shippingOption = await _unitOfWork.ShippingOption.GetAsync(c => c.Id == shippingOptionDto.Id);
+                var shippingOption = await _unitOfWork.ShippingOption.GetAsync(c => c.Id == shippingOptionDto.Id
+                                        && c.IsDeleted != true);
                 if (shippingOption == null)
                 {
                     return NotFound();
@@ -126,7 +127,8 @@ namespace ecommerce_server_side.Controllers
         {
             try
             {
-                var shippingOption = await _unitOfWork.ShippingOption.GetAsync(c => c.Id == id && c.IsDeleted != true);
+                var shippingOption = await _unitOfWork.ShippingOption.GetAsync(c => c.Id == id
+                                        && c.IsDeleted != true);
                 if (shippingOption == null)
                 {
                     return NotFound("The shipping option does not exist");
@@ -152,7 +154,8 @@ namespace ecommerce_server_side.Controllers
             {
                 foreach (var shippingOptionDto in shippingOptionDtos)
                 {
-                    var shippingOption = await _unitOfWork.ShippingOption.GetAsync(c => c.Id == shippingOptionDto.Id && c.IsDeleted != true);
+                    var shippingOption = await _unitOfWork.ShippingOption.GetAsync(c => c.Id == shippingOptionDto.Id
+                                            && c.IsDeleted != true);
                     if (shippingOption == null)
                     {
                         return NotFound("The shipping option does not exist");

@@ -90,8 +90,7 @@ namespace DataAccess.Repository
                 }
                 // Not deleted filter and status is publish
                 query = query.Where(x => x.IsDeleted != true && x.Status == "publish");
-                // Sorting
-                query = _sortHelper.ApplySort(query, productParameters.OrderBy);
+
             }
 
 
@@ -105,6 +104,12 @@ namespace DataAccess.Repository
                     query = query.Include(property);
                 }
             }
+            // Sorting
+            if (productParameters.OrderBy != null)
+            {
+                query = _sortHelper.ApplySort(query, productParameters.OrderBy);
+            }
+
             return await PagedList<Product>.ToPagedList(query,
                 productParameters.PageNumber,
                 productParameters.PageSize);

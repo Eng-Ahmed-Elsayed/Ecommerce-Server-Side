@@ -159,7 +159,8 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invalid Model!");
                 }
 
-                var discount = await _unitOfWork.Discount.GetAsync(c => c.Id == discountDto.Id, "Products");
+                var discount = await _unitOfWork.Discount.GetAsync(c => c.Id == discountDto.Id
+                                && c.IsDeleted != true, "Products");
                 if (discount == null)
                 {
                     return NotFound();

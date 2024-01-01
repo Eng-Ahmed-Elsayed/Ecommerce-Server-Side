@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Models.Models
@@ -51,6 +52,33 @@ namespace Models.Models
         public Category? Category { get; }
         public Guid? InventoryId { get; set; }
         public Inventory? Inventory { get; }
+        // Reviews list
+        public List<Review> Reviews { get; } = new();
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Precision(2, 1)]
+        public decimal AvgRating // Return average rating if the product has reviews.
+        {
+            get
+            {
+                if (Reviews.Count > 0)
+                {
+                    decimal avg = 0;
+                    int count = 0;
+                    foreach (var review in Reviews)
+                    {
+                        // If this review is available.
+                        if (review.IsDeleted != true)
+                        {
+                            avg += review.Rating;
+                            count++;
+                        }
+                    }
+                    return avg / count;
+                }
+                return 0;
+            }
+        }
+
         [Required]
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

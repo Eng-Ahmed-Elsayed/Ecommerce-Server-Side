@@ -33,7 +33,7 @@ namespace Models.DataTransferObjects.Shared
         public decimal Price { get; set; }
         [Precision(2, 1)]
         [Range(0, 5)]
-        public decimal? Rating { get; set; }
+        public decimal Rating { get; set; }
         // Publish or draft 
         [Required]
         public string? Status { get; set; }
@@ -52,6 +52,10 @@ namespace Models.DataTransferObjects.Shared
         public Guid? InventoryId { get; set; }
         public InventoryDto? Inventory { get; set; }
         public List<DiscountDto>? Discounts { get; set; }
+        // Reviews list
+        public List<ReviewDto> Reviews { get; set; }
+        [Precision(2, 1)]
+        public decimal? AvgRating { get; set; }
 
 
         // Used to add or update inventory quantity to a product.

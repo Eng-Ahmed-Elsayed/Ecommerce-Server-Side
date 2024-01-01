@@ -50,6 +50,12 @@ namespace DataAccess.Data
             .HasOne<CheckList>()
             .WithOne();
 
+            modelBuilder.Entity<User>() // User with Review
+            .HasMany(u => u.Reviews) // A user has many reviews
+            .WithOne(r => r.User) // A review belongs to one user
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
             // Product relations
             modelBuilder.Entity<Category>()
             .HasMany<Product>()
@@ -104,6 +110,11 @@ namespace DataAccess.Data
             .HasMany(e => e.Colors)
             .WithMany();
 
+            modelBuilder.Entity<Product>() // Product with reviews
+            .HasMany(p => p.Reviews) // A product has many reviews
+            .WithOne(r => r.Product) // A review belongs to one product
+            .HasForeignKey(r => r.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
 
             // OrderDetails with OrderItem
@@ -171,6 +182,6 @@ namespace DataAccess.Data
         public DbSet<Size> Sizes { get; set; }
         public DbSet<CheckList> CheckLists { get; set; }
         public DbSet<CheckListItem> CheckListItems { get; set; }
-
+        public DbSet<Review> Reviews { get; set; }
     }
 }

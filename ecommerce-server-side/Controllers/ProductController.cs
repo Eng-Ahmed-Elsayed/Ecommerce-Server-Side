@@ -38,13 +38,14 @@ namespace ecommerce_server_side.Controllers
             {
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
                 Product? product;
+                string includeProperites = "ProductImages,Tags,Colors,Sizes,Category,Inventory,Reviews.User";
                 //if admin
                 if (userRole == "Administrator")
                 {
                     product = await _unitOfWork.Product.GetAsync(p =>
                             p.Id == id
                             && p.IsDeleted != true
-                            , "ProductImages,Tags,Colors,Sizes,Inventory");
+                            , includeProperites);
                 }
                 // else status is publish
                 else
@@ -53,13 +54,15 @@ namespace ecommerce_server_side.Controllers
                             p.Id == id
                             && p.IsDeleted != true
                             && p.Status == "publish"
-                            , "ProductImages,Tags,Colors,Sizes,Inventory");
+                            , includeProperites);
                 }
 
                 if (product == null)
                 {
                     return NotFound();
                 }
+                // Filter reviews.
+                product.Reviews.RemoveAll(r => r.IsDeleted == true);
                 var productResult = _mapper.Map<ProductDto>(product);
 
                 // If the user is logged in.
@@ -81,6 +84,8 @@ namespace ecommerce_server_side.Controllers
                         }
                     }
                 }
+                // Filter reviews.
+                //productResult.Reviews = productResult.Reviews.FindAll(r => r.IsDeleted != true);
                 return Ok(productResult);
             }
             catch (Exception ex)
@@ -96,11 +101,12 @@ namespace ecommerce_server_side.Controllers
             {
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
                 IEnumerable<Product> products;
+                string includeProperites = "ProductImages,Tags,Colors,Sizes,Inventory,Reviews,Category";
                 //if admin
                 if (userRole == "Administrator")
                 {
                     products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
-                       , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                       , includeProperites);
                 }
                 // else status is publish
                 else
@@ -108,7 +114,7 @@ namespace ecommerce_server_side.Controllers
                     products = await _unitOfWork.Product.GetListAsync(p =>
                                 p.IsDeleted != true
                                 && p.Status == "publish"
-                                    , "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                                    , includeProperites);
                 }
 
                 var productsResult = _mapper.Map<IEnumerable<ProductDto>>(products);
@@ -150,7 +156,7 @@ namespace ecommerce_server_side.Controllers
             try
             {
                 var products = await _unitOfWork.Product.GetPagedListAsync(productParameters,
-                            "ProductImages,Tags,Colors,Sizes,Category,Inventory");
+                            "ProductImages,Tags,Colors,Sizes,Category,Reviews,Inventory");
 
                 var metadata = new
                 {
@@ -337,7 +343,9 @@ namespace ecommerce_server_side.Controllers
                     return BadRequest("Invalid Model!");
                 }
 
-                var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id, "ProductImages,Tags,Colors,Sizes");
+                var product = await _unitOfWork.Product.GetAsync(c => c.Id == productDto.Id
+                                && c.IsDeleted != true,
+                                "ProductImages,Tags,Colors,Sizes,Reviews");
                 if (product == null)
                 {
                     return NotFound();

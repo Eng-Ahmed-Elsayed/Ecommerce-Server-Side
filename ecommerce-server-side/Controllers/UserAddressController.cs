@@ -105,7 +105,7 @@ namespace ecommerce_server_side.Controllers
 
                 var userId = User.FindFirst("id")?.Value;
                 var userAddress = await _unitOfWork.UserAddress.GetAsync(e =>
-                e.Id == userAddressDto.Id && e.UserId == userId);
+                e.Id == userAddressDto.Id && e.UserId == userId && e.IsDeleted != true);
                 if (userAddress == null)
                 {
                     return NotFound("User address does not exist");
