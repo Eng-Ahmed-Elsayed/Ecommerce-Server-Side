@@ -88,6 +88,13 @@ namespace DataAccess.Repository
                     query = query.Where(x => x.Category.Name == productParameters.Category
                                 && x.Category.IsDeleted != true);
                 }
+
+                // Featured Products filter
+                if (productParameters.Featured == true)
+                {
+                    query = query.Where(x => x.Featured == true);
+                }
+
                 // Not deleted filter and status is publish
                 query = query.Where(x => x.IsDeleted != true && x.Status == "publish");
 

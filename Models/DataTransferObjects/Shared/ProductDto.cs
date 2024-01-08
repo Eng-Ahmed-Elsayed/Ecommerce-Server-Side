@@ -37,8 +37,8 @@ namespace Models.DataTransferObjects.Shared
         // Publish or draft 
         [Required]
         public string? Status { get; set; }
-        [Required]
-        public bool InStock { get; set; }
+        //[Required]
+        //public bool InStock { get; set; }
         [MaxLength(20)]
         public List<Tag>? Tags { get; set; }
         [MaxLength(20)]
@@ -53,9 +53,10 @@ namespace Models.DataTransferObjects.Shared
         public InventoryDto? Inventory { get; set; }
         public List<DiscountDto>? Discounts { get; set; }
         // Reviews list
-        public List<ReviewDto> Reviews { get; set; }
+        public List<ReviewDto>? Reviews { get; set; }
         [Precision(2, 1)]
         public decimal? AvgRating { get; set; }
+        public bool? Featured { get; set; }
 
 
         // Used to add or update inventory quantity to a product.

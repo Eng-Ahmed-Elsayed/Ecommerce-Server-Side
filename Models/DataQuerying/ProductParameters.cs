@@ -30,6 +30,8 @@ namespace Models.DataQuerying
         [StringLength(40, ErrorMessage = "Category name length can't be more than 40.")]
         public string? Category { get; set; }
 
+        public bool? Featured { get; set; }
+
         public ProductParameters()
         {
             OrderBy = "name";

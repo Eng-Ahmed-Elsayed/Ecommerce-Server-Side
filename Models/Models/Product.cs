@@ -35,8 +35,8 @@ namespace Models.Models
         // Publish or draft 
         [Required]
         public string Status { get; set; }
-        [Required]
-        public bool InStock { get; set; }
+        //[Required]
+        //public bool InStock { get; set; }
         [MaxLength(20)]
         public List<Tag> Tags { get; set; } = new();
         [MaxLength(20)]
@@ -53,7 +53,7 @@ namespace Models.Models
         public Guid? InventoryId { get; set; }
         public Inventory? Inventory { get; }
         // Reviews list
-        public List<Review> Reviews { get; } = new();
+        public List<Review>? Reviews { get; } = new();
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Precision(2, 1)]
         public decimal AvgRating // Return average rating if the product has reviews.
@@ -78,6 +78,8 @@ namespace Models.Models
                 return 0;
             }
         }
+        // To set product in featured products list.
+        public bool? Featured { get; set; }
 
         [Required]
         public DateTime? CreatedAt { get; set; }

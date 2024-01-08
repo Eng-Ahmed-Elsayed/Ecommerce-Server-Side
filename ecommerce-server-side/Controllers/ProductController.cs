@@ -250,6 +250,25 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
+        // Delete image with path from DB and Local Storage
+        private async Task DeleteImage(string imgPath)
+        {
+            if (!imgPath.IsNullOrEmpty())
+            {
+                _manageFiles.DeleteImage(imgPath);
+                var imgToBeDeleted = await _unitOfWork.ProductImage.GetAsync(x => x.ImgPath == imgPath);
+                if (imgToBeDeleted != null)
+                {
+                    await _unitOfWork.ProductImage.DeleteAsync(imgToBeDeleted);
+                }
+            }
+
+        }
+
+        // For Tags, Colors and Sizes we can use normal way to update them but i did not create
+        // a controller or actions for creating or updating them so what we will apply here
+        // for example if color red is not in the database creat it then add it to the product
+        // if it is in the database just add this to the product and so on.
         // If the tag is new add it to the db then add to the tags list finally return this list.
         private async Task<List<Tag>> UpdateProductTagsAsync(List<Tag>? tagsDto)
         {
@@ -294,7 +313,6 @@ namespace ecommerce_server_side.Controllers
             return colors;
         }
         // If the size is new add it to the db then add to the size list finally return this list.
-
         private async Task<List<Size>> UpdateProductSizesAsync(List<Size>? sizesDto)
         {
             List<Size> sizes = new List<Size>();
@@ -316,21 +334,7 @@ namespace ecommerce_server_side.Controllers
             return sizes;
         }
 
-        // Delete image with path from DB and Local Storage
-        private async Task DeleteImage(string imgPath)
-        {
-            if (!imgPath.IsNullOrEmpty())
-            {
-                _manageFiles.DeleteImage(imgPath);
-                var imgToBeDeleted = await _unitOfWork.ProductImage.GetAsync(x => x.ImgPath == imgPath);
-                if (imgToBeDeleted != null)
-                {
-                    await _unitOfWork.ProductImage.DeleteAsync(imgToBeDeleted);
-                }
-            }
-
-        }
-
+        // Update product
         [HttpPut]
         [Route("{id:guid}")]
         [Authorize(Roles = "Administrator")]
@@ -384,8 +388,9 @@ namespace ecommerce_server_side.Controllers
                 product.ProductSKU = productDto.ProductSKU;
                 product.Price = productDto.Price;
                 product.Status = productDto.Status;
-                product.InStock = productDto.InStock;
+                //product.InStock = productDto.InStock;
                 product.CategoryId = productDto.CategoryId;
+                product.Featured = productDto.Featured;
                 product.UpdatedAt = DateTime.Now;
                 // Update quantity in the inventory
                 Inventory inventory = await _unitOfWork.Inventory.GetAsync(i => i.Id == product.InventoryId);
@@ -471,5 +476,88 @@ namespace ecommerce_server_side.Controllers
             }
         }
 
+        // Get feature and not featrue products to the admin.
+        [HttpGet]
+        [Route("feature-products")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GetFeatureProductsAndOther()
+        {
+            try
+            {
+                // Get all products
+                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
+                       , "ProductImages,Category");
+                if (products == null)
+                {
+                    return BadRequest();
+                }
+                // Create new obj
+                UpsertFeatureProductsDto upsertFeatureProductsDto = new();
+                // Set feature products
+                upsertFeatureProductsDto.FeatureProducts = _mapper.Map<IEnumerable<ProductDto>>
+                    (products.Where(p => p.Featured == true));
+                // Set other products
+                upsertFeatureProductsDto.OtherProducts = _mapper.Map<IEnumerable<ProductDto>>
+                    (products.Where(p => p.Featured != true));
+                return Ok(upsertFeatureProductsDto);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
+            }
+        }
+
+        // Add product to feature products or remove it.
+        [HttpPatch]
+        [Route("feature-products")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> UpsertFeatureProducts(UpsertFeatureProductsDto upsertFeatureProductsDto)
+        {
+            try
+            {
+                // Get all products
+                var products = await _unitOfWork.Product.GetListAsync(p => p.IsDeleted != true
+                       , "ProductImages");
+                if (products == null)
+                {
+                    return BadRequest();
+                }
+                // Set old feature products
+                var oldFeatureProducts = products.Where(p => p.Featured == true);
+                // Set old other products
+                var oldOtherProducts = products.Where(p => p.Featured != true);
+                // Loop in new feature products
+                // If feature product also in old list containue
+                foreach (var product in upsertFeatureProductsDto.FeatureProducts)
+                {
+                    // If new feature product not in the old list make this product with true
+                    if (!oldFeatureProducts.Any(p => p.Id == product.Id))
+                    {
+                        // Get the product
+                        var updatedProduct = await _unitOfWork.Product.GetAsync(p => p.Id == product.Id
+                        && p.IsDeleted != true);
+                        // Mark it true
+                        updatedProduct.Featured = true;
+                    }
+                }
+                // Loop in old feature products
+                foreach (var product in oldFeatureProducts)
+                {
+                    // If old feature product not in the new list mark this porduct with false
+                    if (!upsertFeatureProductsDto.FeatureProducts.Any(p => p.Id == product.Id))
+                    {
+                        // Mark it with false
+                        product.Featured = false;
+                    }
+                }
+                await _unitOfWork.SaveAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
+            }
+        }
     }
 }

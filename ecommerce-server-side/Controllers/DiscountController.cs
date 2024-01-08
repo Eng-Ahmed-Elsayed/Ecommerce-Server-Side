@@ -73,7 +73,7 @@ namespace ecommerce_server_side.Controllers
             try
             {
                 var discount = await _unitOfWork.Discount.GetAsync(c =>
-                (c.Id == id && c.IsDeleted != true), "Products.ProductImages");
+                (c.Id == id && c.IsDeleted != true), "Products.ProductImages,Products.Category");
                 if (discount == null)
                 {
                     return NotFound();
@@ -82,7 +82,7 @@ namespace ecommerce_server_side.Controllers
 
                 var otherProducts = await _unitOfWork.Product.GetListAsync(p =>
                     !p.Discounts.Any(d => d.Id == discount.Id)
-                    && p.IsDeleted != true, "ProductImages");
+                    && p.IsDeleted != true, "ProductImages,Category");
                 discountResult.OtherProducts = _mapper.Map<List<ProductDto>>(otherProducts);
                 return Ok(discountResult);
             }
