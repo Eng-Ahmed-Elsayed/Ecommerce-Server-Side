@@ -27,10 +27,10 @@
 
 To run this project locally:
 
-1. Clone the repository.
+1. Clone the repository and client side repository.
 2. Install dependencies for the frontend and backend.
 3. Start the backend server.
-4. Run the Angular app: `ng serve -o` for a dev server.
+4. Run the Angular app: `ng serve -o` for a dev server .
 
 ## Usage
 
@@ -39,39 +39,10 @@ To run this project locally:
 3. Proceed to checkout to complete a purchase.
 4. Admins can log in to the admin panel to manage the app.
 
-## Video
+## Screenshots & Video
 
-Watch the video on google dive.
+* You can find all screenhots and video in the [Client Side here](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side)
 
-[<img src="screenshots/1.png" width="70%">](https://drive.google.com/file/d/1Qu-ns4Em2j8oDtlUtO9pkKia_3f20atT/preview "Ecommerce Demo")
-
-## Screenshots
-
-![Screenshot 1](/screenshots/1.png)
-![Screenshot 1](/screenshots/2.png)
-![Screenshot 1](/screenshots/3.png)
-![Screenshot 1](/screenshots/4.png)
-![Screenshot 1](/screenshots/5.png)
-![Screenshot 1](/screenshots/6.png)
-![Screenshot 1](/screenshots/7.png)
-![Screenshot 1](/screenshots/8.png)
-
-## Featured Screenshots
-
-In this section, we present additional featured screenshots to showcase specific aspects of the application. You can see all the screenshots from the following links.
-
-* [User Authentication & Profile](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/auth&user)
-* [Home](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/home)
-* [Admin Panel](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/admin-panel)
-* [Product Catalog](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/product-catalog)
-* [Product Overview](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/product-overview)
-* [Watch List](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/watch-list)
-* [Shopping Cart](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/shopping-cart)
-* [Check Out](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/check-out)
-* [Order History](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/order-history)
-* [Mobile Screen](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/mobile-screen)
-* [Viewer Pages](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/viewer-pages)
-* [Errors](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side/screenshots/errors)
 
 ## Future Improvements
 
