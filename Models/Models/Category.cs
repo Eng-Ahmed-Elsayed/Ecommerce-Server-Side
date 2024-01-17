@@ -22,9 +22,6 @@ namespace Models.Models
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool? IsDeleted { get; set; }
-        //[Required]
-        //[MinLength(5)]
-        //[MaxLength(75)]
 
     }
 }

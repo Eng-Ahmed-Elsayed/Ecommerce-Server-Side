@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /ecommerce-server-side/appsettings.json
 /ecommerce-server-side/appsettings.json
+/ecommerce-server-side/appsettings.json
+*.png
+*.jpg

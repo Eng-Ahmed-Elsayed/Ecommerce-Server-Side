@@ -73,7 +73,7 @@ namespace Models.Models
                             count++;
                         }
                     }
-                    return avg / count;
+                    return count != 0 ? avg / count : avg;
                 }
                 return 0;
             }

@@ -94,10 +94,8 @@ namespace ecommerce_server_side.Controllers
                     var errors = result.Errors.Select(e => e.Description);
                     return BadRequest(new RegistrationResponseDto { Errors = errors, IsSuccessfulRegistration = false });
                 }
-
-                await SendEmailConfirmationEmail(user, userForRegistrationDto.ClientURI);
-
                 await _userManager.AddToRoleAsync(user, "Viewer");
+                await SendEmailConfirmationEmail(user, userForRegistrationDto.ClientURI);
                 return StatusCode(201, new RegistrationResponseDto { IsSuccessfulRegistration = true });
             }
             catch (Exception ex)
@@ -267,140 +265,176 @@ namespace ecommerce_server_side.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> RestPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest("Invaild model.");
-            }
-            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invaild model.");
+                }
+                var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
 
-            if (user == null)
+                if (user == null)
+                {
+                    return BadRequest("Invalid request.");
+                }
+                var restPasswordResult = await _userManager.ResetPasswordAsync(user,
+                    resetPasswordDto.Token, resetPasswordDto.Password);
+
+                if (!restPasswordResult.Succeeded)
+                {
+                    var errors = restPasswordResult.Errors.Select(e => e.Description);
+                    return BadRequest(new { Errors = errors });
+                }
+
+                await _userManager.SetLockoutEndDateAsync(user, new DateTime(2000, 1, 1));
+                return Ok();
+            }
+
+            catch (Exception ex)
             {
-                return BadRequest("Invalid request.");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
-            var restPasswordResult = await _userManager.ResetPasswordAsync(user,
-                resetPasswordDto.Token, resetPasswordDto.Password);
-
-            if (!restPasswordResult.Succeeded)
-            {
-                var errors = restPasswordResult.Errors.Select(e => e.Description);
-                return BadRequest(new { Errors = errors });
-            }
-
-            await _userManager.SetLockoutEndDateAsync(user, new DateTime(2000, 1, 1));
-
-            return Ok();
         }
 
         [HttpPost("email-confirmation")]
         public async Task<IActionResult> EmailConfirmation([FromBody] EmailConfirmationDto emailConfirmationDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest("Invaild model.");
-            }
-            var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
-            if (user == null)
-            {
-                return BadRequest("Invalid email confirmation request");
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invaild model.");
+                }
+                var user = await _userManager.FindByEmailAsync(emailConfirmationDto.Email);
+                if (user == null)
+                {
+                    return BadRequest("Invalid email confirmation request");
+                }
 
-            if (user.EmailConfirmed)
-            {
-                return BadRequest("Your email is already confirmed");
-            }
+                if (user.EmailConfirmed)
+                {
+                    return BadRequest("Your email is already confirmed");
+                }
 
-            // If last email was sent before one or more mins.
-            var confirmResult = await _userManager.ConfirmEmailAsync(user, emailConfirmationDto.Token);
-            if (!confirmResult.Succeeded)
-            {
-                var errors = confirmResult.Errors.Select(e => e.Description);
-                return BadRequest(errors);
+                // If last email was sent before one or more mins.
+                var confirmResult = await _userManager.ConfirmEmailAsync(user, emailConfirmationDto.Token);
+                if (!confirmResult.Succeeded)
+                {
+                    var errors = confirmResult.Errors.Select(e => e.Description);
+                    return BadRequest(errors);
+                }
+                return Ok();
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
+            }
         }
 
         [HttpPost("send-email-confirmation")]
         public async Task<IActionResult> SendEmailConfirmation([FromBody] SendEmailConfirmationDto sendEmailConfirmationDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest("Invaild model.");
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invaild model.");
+                }
+                var user = await _userManager.FindByEmailAsync(sendEmailConfirmationDto.Email);
+                if (user == null)
+                {
+                    return BadRequest("Invalid Request");
+                }
+                if (user.EmailConfirmed)
+                {
+                    return BadRequest("Your email is already confirmed");
+                }
+                var result = await SendEmailConfirmationEmail(user, sendEmailConfirmationDto.ClientURI);
+                if (result)
+                {
+                    return Ok();
+                }
+                return BadRequest("Please wait 1 minute to send new email.");
             }
-            var user = await _userManager.FindByEmailAsync(sendEmailConfirmationDto.Email);
-            if (user == null)
+
+            catch (Exception ex)
             {
-                return BadRequest("Invalid Request");
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
             }
-            if (user.EmailConfirmed)
-            {
-                return BadRequest("Your email is already confirmed");
-            }
-            var result = await SendEmailConfirmationEmail(user, sendEmailConfirmationDto.ClientURI);
-            if (result)
-            {
-                return Ok();
-            }
-            return BadRequest("Please wait 1 minute to send new email.");
         }
 
         [HttpPost("external-login")]
         public async Task<IActionResult> ExternalLogin([FromBody] ExternalAuthDto externalAuth)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest("Invaild model.");
-            }
-            var payload = await _jwtHandler.VerifyGoogleToken(externalAuth);
-            if (payload == null)
-                return BadRequest("Invalid External Authentication.");
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invaild model.");
+                }
+                var payload = await _jwtHandler.VerifyGoogleToken(externalAuth);
+                if (payload == null)
+                    return BadRequest("Invalid External Authentication.");
 
-            var info = new UserLoginInfo(externalAuth.Provider, payload.Subject, externalAuth.Provider);
+                var info = new UserLoginInfo(externalAuth.Provider, payload.Subject, externalAuth.Provider);
 
-            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-            if (user == null)
-            {
-                user = await _userManager.FindByEmailAsync(payload.Email);
-
+                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
                 if (user == null)
                 {
-                    user = new User { Email = payload.Email, UserName = payload.Email, CreatedAt = DateTime.Now };
-                    await _userManager.CreateAsync(user);
+                    user = await _userManager.FindByEmailAsync(payload.Email);
 
-                    //prepare and send an email for the email confirmation
+                    if (user == null)
+                    {
+                        user = new User { Email = payload.Email, UserName = payload.Email, CreatedAt = DateTime.Now };
+                        await _userManager.CreateAsync(user);
 
-                    await _userManager.AddToRoleAsync(user, "Viewer");
-                    await _userManager.AddLoginAsync(user, info);
+                        //prepare and send an email for the email confirmation
+
+                        await _userManager.AddToRoleAsync(user, "Viewer");
+                        await _userManager.AddLoginAsync(user, info);
+                    }
+                    else
+                    {
+                        await _userManager.AddLoginAsync(user, info);
+                    }
                 }
-                else
-                {
-                    await _userManager.AddLoginAsync(user, info);
-                }
+
+                if (user == null)
+                    return BadRequest("Invalid External Authentication.");
+
+                //check for the Locked out account
+
+                var token = await _jwtHandler.GenerateToken(user);
+                return Ok(new AuthResponseDto { Token = token, IsAuthSuccessful = true, Email = user.Email });
             }
-
-            if (user == null)
-                return BadRequest("Invalid External Authentication.");
-
-            //check for the Locked out account
-
-            var token = await _jwtHandler.GenerateToken(user);
-            return Ok(new AuthResponseDto { Token = token, IsAuthSuccessful = true, Email = user.Email });
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
+            }
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutDto revokeTokenDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest("Invalid Authentication");
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid Authentication");
+                }
 
-            var user = await _userManager.FindByEmailAsync(revokeTokenDto.Email);
-            if (user == null)
-            {
-                return BadRequest("Invalid Authentication");
+                var user = await _userManager.FindByEmailAsync(revokeTokenDto.Email);
+                if (user == null)
+                {
+                    return BadRequest("Invalid Authentication");
+                }
+                // TBD: We need to black list the token because we can not revoke the token directly.
+                return Ok();
             }
-            // TBD: We need to black list the token because we can not revoke the token directly.
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"The server encountered an unexpected condition. Please try again later.");
+            }
         }
 
         [Authorize]
@@ -443,7 +477,7 @@ namespace ecommerce_server_side.Controllers
                     {
                         return Ok();
                     }
-                    return BadRequest();
+                    return BadRequest(result.Errors);
                 }
                 else
                 {
@@ -490,7 +524,7 @@ namespace ecommerce_server_side.Controllers
                     {
                         return Ok();
                     }
-                    return BadRequest();
+                    return BadRequest(result.Errors);
                 }
                 else
                 {
