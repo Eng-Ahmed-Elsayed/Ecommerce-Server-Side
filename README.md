@@ -1,4 +1,4 @@
-# Ecommerce Full Stack - Server Side
+# StackStore - Server Side
 
 * This project is a full-stack e-commerce web application built using Angular for the frontend and .NET API for the backend.
 * This is the server side you can find the [Client Side here](https://github.com/Eng-Ahmed-Elsayed/Ecommerce-Client-Side)
